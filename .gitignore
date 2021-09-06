@@ -1,0 +1,8 @@
+node_modules
+pictures
+parametres.js
+package.json
+.npmrc
+.eslintrc.json
+*.jpg
+*.png
