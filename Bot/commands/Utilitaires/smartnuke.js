@@ -1,0 +1,102 @@
+/* eslint-disable no-extra-parens */
+/* eslint-disable no-nested-ternary */
+const {MESSAGES} = require('../../starterpack/constants')
+const Tournoi = require('../../modeles/tournoi');
+const Reactor = require('../../modeles/reactor');
+
+module.exports.run = async (client, message, args) => {
+    let oldchannel = message.guild.channels.cache.get(message.channel.id)
+    if (args.length) {
+        oldchannel = await client.getObjectOf(args[1], 'channel', message.guild)
+        if (!oldchannel) return message.reply('salon invalide !')
+    }
+    if (message.guild.publicUpdatesChannelID === oldchannel.id) return message.reply("le bot est incapable de supprimer ce salon car celui-ci est un salon de mises à jour de communauté (voir **Paramètres du serveur** > Onglet __Communauté__ > **Vue d'ensemble**).")
+    if (message.guild.rulesChannelID === oldchannel.id) return message.reply("le bot est incapable de supprimer ce salon car celui-ci est un salon de règlement de communauté (voir **Paramètres du serveur** > Onglet __Communauté__ > **Vue d'ensemble**).")
+    if (oldchannel.deleted) return message.reply("le bot est incapable de supprimer ce salon car celui-ci est déjà supprimé : Discord peut mettre du temps à répondre pour la suppression d'un salon, et ainsi causer des erreurs.")
+    if (!oldchannel.deletable) return message.reply("le bot est incapable de supprimer ce salon car il n'a pas les permissions pour supprimer ce salon (si le bot n'est pas administrateur, pensez à vérifier les permissions du rôle attribué au bot).")
+    const newchannel = await oldchannel.clone({reason: "Nuke du channel 1/2"})
+    newchannel.setPosition(oldchannel.position)
+    const Server = await client.getGuild(message.guild) // Les lignes 19 à 30 marchent parfaitement
+    // console.log('Server = ', Server || 'Aucun !');
+    // console.log('Server.logChannel === oldchannel.id :', Server.logChannel === oldchannel.id);
+    if (Server.logChannel === oldchannel.id) {
+        await client.updateGuild(message.guild, {logChannel: newchannel.id})
+        console.log("Channel de logs redéfini !");
+    }
+    // console.log('Server.generalChannel === oldchannel.id :', Server.generalChannel === oldchannel.id);
+    if (Server.generalChannel === oldchannel.id) {
+        await client.updateGuild(message.guild, {generalChannel: newchannel.id})
+        console.log("Channel général redéfini !");
+    }
+    //On check s'il y a des réacteurs dans le salon qu'on va supprimer
+    const reactors = await Reactor.find(r => {
+        if (!r) return null
+        return r.channelID === oldchannel.id
+    })
+    console.log('reactors = ', reactors || 'Aucun !');
+    if (reactors.length) {
+        console.log('Epinglage des réacteurs');
+        //Si oui, on les épingle tous quand ils ne sont pas épinglés
+        for(let i=0; i<reactors.length; i++) {
+            const msgReactor = await oldchannel.messages.fetch(reactors[i].msgReactorID)
+                .catch(async () => {
+                    await client.deleteReactor(reactors[i].msgReactorID, 'all')
+                    i--
+                })
+            if (!msgReactor.pinned) await msgReactor.pin()
+        }
+    }
+    // Ensuite on checke les tournois, et si le channel est un channel de tournoi, on change l'id dans la BDD, et on ré-envoie les informations dans le channel.
+    const tournois = await Tournoi.find(t => t && t.guildID === message.guild.id)
+    // console.log('tournois = ', tournois || 'Aucun !');
+    if (tournois) { //Ceci marche j'ai l'impression, à vérifier une fois les réacteurs finis
+        for (let i=0; i<tournois.length; i++) {
+            if (tournois[i].InscriptionsChannelID === oldchannel.id) {
+                tournois[i].InscriptionsChannelID = newchannel.id
+                console.log('Channel d\'inscriptions redéfini !');
+                await tournois[i].save()
+            } else if (tournois[i].StaffChannelID === oldchannel.id) {
+                tournois[i].StaffChannelID = newchannel.id
+                console.log('Channel du staff redéfini !');
+                await tournois[i].save()
+            }
+        }
+    }
+    //On prend tous les messages épinglés du salon qui va être supprimé et on les envoie chronologiquement dans le nouveau salon.
+    let pinnedMessages = await oldchannel.messages.fetchPinned()
+    pinnedMessages = pinnedMessages.array()
+    console.log('pinnedMessages = ', pinnedMessages || 'Aucun !');
+    for (let i=pinnedMessages.length-1; i>=0; i--) {
+        let options = [] //PREVOIR UN CAS pour les messages épinglés qui viennent d'autres smartnukes et qui ont déjà la mention : "auteur : ..."
+        pinnedMessages[i].embeds? (pinnedMessages[i].attachments? options=[pinnedMessages[i].attachments, pinnedMessages[i].embeds].flat(2) : options=[pinnedMessages[i].embeds].flat(2)) : options=[]
+        const newmsg = await newchannel.send(`${pinnedMessages[i].author.bot? '':`> Auteur : ${pinnedMessages[i].author.username}${pinnedMessages[i].author.discriminator} (ID : \`${pinnedMessages[i].author.id}\`)\n\n`}`+pinnedMessages[i].content, options)
+        await newmsg.pin() //Ceci marche of course
+        if (reactors.length) {
+            console.log('Modification d\'un réacteur');
+            //Je ne sais pas si ce code marche, à vérifier
+            const reac = await reactors.find(r => r.msgReactorID === pinnedMessages[i].id)
+            if (reac) {
+                reac.msgReactorID = newmsg.id
+                await reac.save()
+                for (let j=0; j<reac.emojis.length; j++) {
+                    await newmsg.react(reac.emojis[j])
+                }
+            }
+        }
+    }
+    const senders = await Reactor.find(re => re && re.channelsending.includes(oldchannel.id))
+    //PROBLEME ICI, tous les documents sont sélectionnés. A voir comment faire pour régler ça
+    console.log('senders = ', senders || 'Aucun !');
+    if (senders.length) {
+        console.log('Modification de l\'envoi d\'informations des réacteurs');
+        for (let j=0; j<senders.length; j++) {
+            const index = await senders[j].channelsending.indexOf(oldchannel.id)
+            senders[j].channelsending[index] = newchannel.id
+            await senders[j].save()
+        }
+    }
+    //On supprime le salon
+    oldchannel.delete('Nuke du channel 2/2')
+    await newchannel.messages.cache.forEach(e => { if(e.system) e.delete() }) //ceci marche :)
+}
+module.exports.help = MESSAGES.Commandes.Utilitaires.SMARTNUKE;

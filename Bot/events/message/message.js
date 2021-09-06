@@ -1,0 +1,123 @@
+const discord = require('discord.js');
+const embed = require('../../commands/Utilitaires/embed')
+let long = 0;
+
+module.exports = async (client, message) => {
+
+    if (message.author.bot) return;
+    if (message.channel.type === 'dm') return client.emit('DM', message);
+    const settings = await client.getGuild(message.guild)
+    let dbUser = await client.getUser(message.member)
+
+    if (!dbUser) {
+        await client.createUser({
+            guildID: message.member.guild.id,
+            guildName: message.member.guild.name,
+            userID: message.author.id,
+            username: message.member.user.tag,
+            dmable: true,
+            xp: 0,
+            level: 0
+        })
+        dbUser = await client.getUser(message.author)
+    }
+    const xpCooldown = Math.floor(Math.random()*4 +1)
+    const xpToAdd = Math.floor(Math.random()*25 +10)
+
+    if (xpCooldown === 4) await client.updateXP(message.member, xpToAdd)
+
+    const userLevel = Math.floor(0.1*Math.sqrt(dbUser.xp))
+
+    if (dbUser.level !== userLevel) {
+        if (dbUser.level < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
+        if (dbUser.level > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp} et tu es donc descendu au niveau ${userLevel} !`)
+        client.updateUser(message.member, {level: userLevel})
+    }
+
+
+    if (!message.content.startsWith(settings.prefix)&&!message.content.startsWith(client.config.NAME)) return;
+
+    if (message.content === `${client.config.NAME} prefix`) return embed.run(client, message, `GOLD;; On m'a appelé ?;; Mon préfixe sur ce serveur est : \`${settings.prefix}\``)
+
+    if (message.content.startsWith(settings.prefix)) {
+        long = settings.prefix.length;
+    } else {
+        long = 23;
+    }
+    const args = message.content.slice(long).split(' ');
+    const commandName = args.shift().toLowerCase();
+    const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.help.aliases && cmd.help.aliases.includes(commandName));
+
+    if (!command) {
+        return embed.run(client, message, 'RED;; Oups !;; La commande demandée est inexistante...');
+    }
+
+    if (command.help.arg && !args.length) {
+        let noArgsReply = `Il faut des arguments pour cette commande, ${message.author} !`;
+
+        if (command.help.usage) {
+            noArgsReply += `\nVoici comment utiliser la commande :\`${settings.prefix}${command.help.usage}\``
+        }
+
+        return message.channel.send(noArgsReply);
+    }
+
+    try {
+        if (command.help.Modo && !message.member.hasPermission('KICK_MEMBERS')||command.help.Admin && !message.member.hasPermission('ADMINISTRATOR')) {
+            const nope = new discord.MessageEmbed().
+                setTitle("Hélas !").
+                setColor("BLACK").
+                setTimestamp().
+                setDescription(`<@${message.author.id}>, tu n'as pas les permissions nécessaires pour éxécuter cette commande !`)
+
+
+            return message.channel.send(nope);
+        }
+
+        if (command.help.isUserModo && message.guild.member(message.mentions.users.first()).hasPermission('KICK_MEMBERS')) {
+            const nope = new discord.MessageEmbed().
+                setTitle("Hélaaa jeune chenapan !").
+                setColor("BLACK").
+                setTimestamp().
+                setDescription(`<@${message.author.id}>, tu ne peux pas éxécuter la commande ${command.help.name} sur un modérateur !`);
+
+
+            return message.channel.send(nope);
+        }
+
+    } catch (error) {
+        const nope = new discord.MessageEmbed().
+            setTitle("Houla !").
+            setColor("BLACK").
+            setTimestamp().
+            setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
+
+
+        return message.channel.send(nope);
+    }
+
+    if (!client.cooldowns.has(command.help.name)) {
+        client.cooldowns.set(command.help.name, new discord.Collection());
+    }
+    const timeNow = Date.now();
+    const tStamps = client.cooldowns.get(command.help.name);
+    const cdAmount = (command.help.cooldown || 5)*1000;
+
+    if (tStamps.has(message.author.id)) {
+        const cdExpirationTime = tStamps.get(message.author.id) + cdAmount;
+
+        if (timeNow < cdExpirationTime) {
+            const timeLeft = (cdExpirationTime - timeNow)/1000;
+            let plural = 'seconde'
+
+            if (timeLeft.toFixed(0)>1) plural+='s';
+
+            return message.reply(`merci d'attendre ${timeLeft.toFixed(0)} ${plural} avant de ré-utiliser la commande \`${settings.prefix}${command.help.name}\`.`);
+        }
+    }
+    tStamps.set(message.author.id, timeNow);
+    setTimeout(() => tStamps.delete(message.author.id), cdAmount);
+
+    await command.run(client, message, args, settings, dbUser);
+    message.delete();
+}
