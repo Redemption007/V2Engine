@@ -11,7 +11,7 @@ module.exports.run = async (client, message, args) => {
         return text;
     }
 
-    if (message.author.id !== "554344205405650957" && message.author.id !=="781109649730043965") return message.reply("seul l'owner du bot peut exécuter cette commande !");
+    if (!client.config.OWNERS_ID.includes(message.author.id)) return message.reply("seul les owners du bot peuvent exécuter cette commande !");
     const code = args.join(" ");
     const evaled = eval(code);
     const cleanCode = await clean(evaled);
