@@ -1,9 +1,9 @@
 const ms = require('ms')
 
 module.exports = async client => {
-    const mainGuild = await client.getGuild({id: '776429325838319616'})
+    const mainGuild = await client.getGuild({id: client.config.MAINGUILDID})
     // console.log('mainGuild = ', mainGuild);
-    const mainserver = await client.guilds.fetch('776429325838319616')
+    const mainserver = await client.guilds.fetch(client.config.MAINGUILDID)
     // console.log("mainserver = ", mainserver);
     const generalchannel = await mainserver.channels.cache.get(mainGuild.generalChannel)
     // console.log('generalchannel = ', generalchannel);
