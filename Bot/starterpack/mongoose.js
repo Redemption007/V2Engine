@@ -15,7 +15,7 @@ module.exports = {
             family: 4 //                          Use IPv4, skip trying IPv6
         }
 
-        mongoose.connect(process.env.DBCONNEXION, mongOptions);
+        mongoose.connect(''+process.env.DBCONNEXION, mongOptions);
         mongoose.Promise = global.Promise;
         mongoose.connection.on('connected', () => console.log('\nMongodb est connecté !'));
     }

@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const {loadEvents, loadCommands} = require('./Bot/starterpack/loader');
 const discord = require('discord.js');
 const intents = new discord.Intents(discord.Intents.ALL)

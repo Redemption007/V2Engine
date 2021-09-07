@@ -465,18 +465,6 @@ const MESSAGES = {
                 Admin: false,
                 Modo: false,
             },
-            SMARTNUKE: {
-                name: "smartnuke",
-                category: 'Utilitaires',
-                aliases: ['smartnuke', 'sn'],
-                description: "Supprime le channel et en recrée un à l'identique, en actualisant tous les préréglages du précédent salon ainsi qu'en sauvegardant tous les messages épinglés.",
-                cooldown: 10,
-                arg: false,
-                usage: "smartnuke",
-                isUserModo: false,
-                Admin: false,
-                Modo: true,
-            },
             STATS: {
                 name: "stats",
                 category: 'Utilitaires',
