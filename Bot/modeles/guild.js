@@ -1,5 +1,4 @@
 /* eslint-disable no-multi-spaces */
-require('dotenv').config();
 const mongoose = require('mongoose');
 
 const guildSchema = mongoose.Schema({
