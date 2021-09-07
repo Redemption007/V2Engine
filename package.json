@@ -2,7 +2,7 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "dotenv": "^10.0.0",
-    "mongoose": "^5.12.2",
+    "mongoose": "^5.13.9",
     "ms": "^2.1.2"
   },
   "name": "v2engine",

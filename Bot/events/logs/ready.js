@@ -1,12 +1,13 @@
 const ms = require('ms')
 
 module.exports = async client => {
+    console.log(client.config.MAINGUILDID);
     const mainGuild = await client.getGuild({id: client.config.MAINGUILDID})
-    // console.log('mainGuild = ', mainGuild);
+    console.log('mainGuild = ', mainGuild);
     const mainserver = await client.guilds.fetch(client.config.MAINGUILDID)
     // console.log("mainserver = ", mainserver);
     const generalchannel = await mainserver.channels.cache.get(mainGuild.generalChannel)
-    // console.log('generalchannel = ', generalchannel);
+    console.log('generalchannel = ', generalchannel);
     console.log(`\nConnecté en tant que ${client.user.tag} !`);
     client.user.setPresence({status: 'online', activity: {name: 'l\'extension de son registre de commandes', type: 'COMPETING'}})
     generalchannel.send({embed: {color: 'GOLD', title: 'Merci de votre patience', description: 'Le bot est opérationnel !', timestamp: Date.now()}})

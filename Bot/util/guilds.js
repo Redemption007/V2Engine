@@ -13,6 +13,7 @@ module.exports = client => {
     client.getGuild = async guild => {
         const data = await Guild.findOne({guildID: guild.id});
 
+        console.log(data);
         if (data) return data;
 
         return client.config.DEFAULTSETTINGS;
