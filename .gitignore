@@ -1,6 +1,6 @@
 node_modules
 pictures
-parametres.js
+.env
 .npmrc
 .eslintrc.json
 *.jpg

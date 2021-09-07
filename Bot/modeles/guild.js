@@ -1,36 +1,36 @@
 /* eslint-disable no-multi-spaces */
+require('dotenv').config();
 const mongoose = require('mongoose');
-const {DEFAULTSETTINGS: defaults} =require('../starterpack/parametres');
 
 const guildSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,       //ID propre à MongoDB
-    guildID: String,                           //ID du serveur
-    guildName: String,                         //Nom du serveur
-    prefix: {                                  //Préfixe du serveur
+    _id: mongoose.Schema.Types.ObjectId,                          //ID propre à MongoDB
+    guildID: String,                                              //ID du serveur
+    guildName: String,                                            //Nom du serveur
+    prefix: {                                                     //Préfixe du serveur
         "type": String,
-        "default": defaults.prefix
+        "default": process.env.DEFAULTSETTINGS.prefix
     },
-    logChannel: {                              //Salon de logs du serveur
+    logChannel: {                                                 //Salon de logs du serveur
         "type": String,
-        "default": defaults.logChannel
+        "default": process.env.DEFAULTSETTINGS.logChannel
     },
-    generalChannel: {                          //Salon général du serveur
+    generalChannel: {                                             //Salon général du serveur
         "type": String,
-        "default": defaults.generalChannel
+        "default": process.env.DEFAULTSETTINGS.generalChannel
     },
-    welcomeMessage: {                          //Message de bienvenue
+    welcomeMessage: {                                             //Message de bienvenue
         "type": String,
-        "default": defaults.welcomeMessage
+        "default": process.env.DEFAULTSETTINGS.welcomeMessage
     },
-    staffrole: {                               //Rôle de modérateur du serveur
+    staffrole: {                                                  //Rôle de modérateur du serveur
         "type": String,
-        "default": defaults.staffrole
+        "default": process.env.DEFAULTSETTINGS.staffrole
     },
-    muteRole: {                                //Rôle Mute du serveur
+    muteRole: {                                                   //Rôle Mute du serveur
         "type": String,
-        "default": defaults.muteRole
+        "default": process.env.DEFAULTSETTINGS.muteRole
     },
-    Banned: Array                              //Utilisateurs bannis des tournois
+    Banned: Array                                                 //Utilisateurs bannis des tournois
 })
 
 module.exports = mongoose.model('Guild', guildSchema);

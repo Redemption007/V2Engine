@@ -1,3 +1,4 @@
+require('dotenv').config();
 const {loadEvents, loadCommands} = require('./Bot/starterpack/loader');
 const discord = require('discord.js');
 const intents = new discord.Intents(discord.Intents.ALL)
@@ -7,7 +8,7 @@ const client = new discord.Client(
         ws: {intents: intents}
     });
 require('./Bot/util/index')(client);
-client.config = require('./Bot/starterpack/parametres')
+client.config = process.env;
 client.mongoose = require('./Bot/starterpack/mongoose');
 
 const coll = [
