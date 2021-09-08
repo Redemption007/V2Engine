@@ -48,7 +48,6 @@ module.exports = async (client, message) => {
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.help.aliases && cmd.help.aliases.includes(commandName));
 
     if (!command) {
-        console.log('not a command !');
         return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: "La commande demandée est inexistante..."}]})
     }
 
@@ -113,5 +112,5 @@ module.exports = async (client, message) => {
     setTimeout(() => tStamps.delete(message.author.id), cdAmount);
 
     await command.run(client, message, args, settings, dbUser);
-    message.delete();
+    setTimeout(() => message.delete().catch(), 5000)
 }

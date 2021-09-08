@@ -400,7 +400,7 @@ const MESSAGES = {
                 description: "Renvoie l'id d'un emoji (ou sa version unicode), d'un utilisateur, d'un salon ou d'un rôle.",
                 cooldown: 5,
                 arg: true,
-                usage: "say <emoji/@user/#salon/@rôle>",
+                usage: "id <emoji/@user/#salon/@rôle>",
                 isUserModo: false,
                 Admin: false,
                 Modo: false,

@@ -22,7 +22,7 @@ module.exports.run = async (client, message, args, settings) => {
         message.channel.send({embeds: [{color: 'GREEN', title: `Les DM du bot sont activés. Tapez \`${settings.prefix}dm false\` pour les désactiver.`}]})
         break
     case false:
-        message.channel.send({embeds: [{color: 'GREEN', title: `Les DM du bot sont désactivés. Tapez \`${settings.prefix}dm false\` pour les réactiver.`}]})
+        message.channel.send({embeds: [{color: 'GREEN', title: `Les DM du bot sont désactivés. Tapez \`${settings.prefix}dm true\` pour les réactiver.`}]})
         break
     }
 }
