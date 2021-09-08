@@ -1,5 +1,4 @@
 const discord = require('discord.js');
-const embed = require('../../commands/Utilitaires/embed')
 let long = 0;
 
 module.exports = async (client, message) => {
@@ -37,7 +36,7 @@ module.exports = async (client, message) => {
 
     if (!message.content.startsWith(settings.prefix)&&!message.content.startsWith(client.config.NAME)) return;
 
-    if (message.content === `${client.config.NAME} prefix`) return embed.run(client, message, `GOLD;; On m'a appelé ?;; Mon préfixe sur ce serveur est : \`${settings.prefix}\``)
+    if (message.content === `${client.config.NAME} prefix`) return message.reply({embeds: [{title: "On m'a appelé ?", color: 'GOLD', description: `Mon préfixe sur ce serveur est : \`${settings.prefix}\``}]})
 
     if (message.content.startsWith(settings.prefix)) {
         long = settings.prefix.length;
@@ -49,7 +48,8 @@ module.exports = async (client, message) => {
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.help.aliases && cmd.help.aliases.includes(commandName));
 
     if (!command) {
-        return embed.run(client, message, 'RED;; Oups !;; La commande demandée est inexistante...');
+        console.log('not a command !');
+        return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: "La commande demandée est inexistante..."}]})
     }
 
     if (command.help.arg && !args.length) {
@@ -63,26 +63,22 @@ module.exports = async (client, message) => {
     }
 
     try {
-        if (command.help.Modo && !message.member.hasPermission('KICK_MEMBERS')||command.help.Admin && !message.member.hasPermission('ADMINISTRATOR')) {
-            const nope = new discord.MessageEmbed().
-                setTitle("Hélas !").
-                setColor("BLACK").
-                setTimestamp().
-                setDescription(`<@${message.author.id}>, tu n'as pas les permissions nécessaires pour éxécuter cette commande !`)
-
-
-            return message.channel.send(nope);
+        if (command.help.Modo && !message.member.permissions.has('KICK_MEMBERS')||command.help.Admin && !message.member.permissions.has('ADMINISTRATOR')) {
+            const nope = new discord.MessageEmbed()
+                .setTitle("Hélas !")
+                .setColor("BLACK")
+                .setTimestamp()
+                .setDescription(`<@${message.author.id}>, tu n'as pas les permissions nécessaires pour éxécuter cette commande !`)
+            return message.channel.send({embeds: [nope]});
         }
 
-        if (command.help.isUserModo && message.guild.member(message.mentions.users.first()).hasPermission('KICK_MEMBERS')) {
-            const nope = new discord.MessageEmbed().
-                setTitle("Hélaaa jeune chenapan !").
-                setColor("BLACK").
-                setTimestamp().
-                setDescription(`<@${message.author.id}>, tu ne peux pas éxécuter la commande ${command.help.name} sur un modérateur !`);
-
-
-            return message.channel.send(nope);
+        if (command.help.isUserModo && message.guild.member(message.mentions.users.first()).permissions.has('KICK_MEMBERS')) {
+            const nope = new discord.MessageEmbed()
+                .setTitle("Hélaaa jeune chenapan !")
+                .setColor("BLACK")
+                .setTimestamp()
+                .setDescription(`<@${message.author.id}>, tu ne peux pas éxécuter la commande ${command.help.name} sur un modérateur !`);
+            return message.channel.send({embeds: [nope]});
         }
 
     } catch (error) {
@@ -91,9 +87,7 @@ module.exports = async (client, message) => {
             setColor("BLACK").
             setTimestamp().
             setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
-
-
-        return message.channel.send(nope);
+        return message.channel.send({embeds: [nope]});
     }
 
     if (!client.cooldowns.has(command.help.name)) {
@@ -112,7 +106,7 @@ module.exports = async (client, message) => {
 
             if (timeLeft.toFixed(0)>1) plural+='s';
 
-            return message.reply(`merci d'attendre ${timeLeft.toFixed(0)} ${plural} avant de ré-utiliser la commande \`${settings.prefix}${command.help.name}\`.`);
+            return message.reply(`Merci d'attendre ${timeLeft.toFixed(0)} ${plural} avant de ré-utiliser la commande \`${settings.prefix}${command.help.name}\`.`);
         }
     }
     tStamps.set(message.author.id, timeNow);

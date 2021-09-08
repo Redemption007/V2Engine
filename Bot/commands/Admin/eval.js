@@ -11,7 +11,7 @@ module.exports.run = async (client, message, args) => {
         return text;
     }
 
-    if (!client.config.OWNERS_ID.includes(message.author.id)) return message.reply("seul les owners du bot peuvent exécuter cette commande !");
+    if (!client.config.OWNERS_ID.includes(message.author.id)) return message.reply("Seuls les owners du bot peuvent exécuter cette commande !");
     const code = args.join(" ");
     const evaled = eval(code);
     const cleanCode = await clean(evaled);

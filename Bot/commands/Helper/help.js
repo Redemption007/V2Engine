@@ -18,9 +18,9 @@ module.exports.run = async (client, message, args, settings) => {
             if (`${category}`.toLowerCase()!=='admin' || message.member.hasPermission('ADMINISTRATOR') && (`${category}`.toLowerCase()!=='moderation' || `${category}`.toLowerCase()!=='modération') || message.member.hasPermission('KICK_MEMBERS')) embed.description += `\n• __**${category}**__`
         }
 
-        if (dbUser.dmable) return message.member.send(embed)
+        if (dbUser.dmable) return message.member.send({embeds: [embed]})
 
-        return message.channel.send(embed);
+        return message.channel.send({embeds: [embed]});
     } else {
         const command = client.commands.get(args[0].toLowerCase()) || client.commands.find(cmd => cmd.help.aliases && cmd.help.aliases.includes(args[0].toLowerCase()));
         const havePerms = cmd => {
@@ -40,9 +40,9 @@ module.exports.run = async (client, message, args, settings) => {
                         .addField(`__Liste des commandes :__`, commandlist, true)
                         .addField('Description de la catégorie :', client.helpCategory(`${category}`.toLowerCase()), true)
 
-                    if (dbUser.dmable) return message.member.send(embed)
+                    if (dbUser.dmable) return message.member.send({embeds: [embed]})
 
-                    return message.channel.send(embed)
+                    return message.channel.send({embeds: [embed]})
                 }
             }
             if (args[0].toLowerCase() === 'owner' && (message.author.id === '554344205405650957' || message.author.id === '781109649730043965')) {
@@ -53,7 +53,7 @@ module.exports.run = async (client, message, args, settings) => {
                     .addField(`__Liste des commandes :__`, commandlist, true)
                     .addField('Description de la catégorie :', client.helpCategory('owner'), true)
 
-                if (dbUser.dmable) return message.member.send(embed)
+                if (dbUser.dmable) return message.member.send({embeds: [embed]})
             }
             if (dbUser.dmable) return message.member.send(`<@${user.id}>, cette commande ou catégorie n'existe pas !`)
 
@@ -74,11 +74,11 @@ module.exports.run = async (client, message, args, settings) => {
         if (command.help.aliases.length >1 ) {
             embed.addField('Aliases :', command.help.aliases.slice(1).join('\n'), true)
         }
-        command.help.Admin? embed.addField('Permissions :', 'Administrateurs uniquement', false) : command.help.Modo? embed.addField('Permissions :', 'Modérateurs uniquement', false) : embed.addField('Permissions :', 'Tout le monde', false)
+        command.help.Admin? embed.addField('Permissions :', 'Administrateurs uniquement', false) : command.help.Modo? embed.addField('Permissions :', 'Modérateurs et + uniquement', false) : embed.addField('Permissions :', 'Tout le monde', false)
 
-        if (dbUser.dmable) return message.member.send(embed)
+        if (dbUser.dmable) return message.member.send({embeds: [embed]})
 
-        return message.channel.send(embed)
+        return message.channel.send({embeds: [embed]})
     }
 }
 module.exports.help = MESSAGES.Commandes.Helper.HELP;

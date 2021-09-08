@@ -1,5 +1,4 @@
 const {MESSAGES} = require('../../starterpack/constants')
-const embed = require('../../commands/Utilitaires/embed')
 
 module.exports.run = async (client, message, args, settings) => {
     let member = message.guild.member(message.mentions.users.first())
@@ -10,7 +9,7 @@ module.exports.run = async (client, message, args, settings) => {
         xp = Number(args[0])
     }
     //On vérifie que pour chaque cas, xp est bien un nombre
-    if (isNaN(xp)) return embed.run(client, message, `RED;; Oups !;; Voici la forme de la commande : ${settings.prefix}${MESSAGES.Commandes.Moderation.ADDXP.usage}`)
+    if (isNaN(xp)) return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: `Voici la forme de la commande : ${settings.prefix}${MESSAGES.Commandes.Moderation.ADDXP.usage}`}]})
 
     const dbUserMentionned = await client.getUser(member)
 
@@ -23,10 +22,10 @@ module.exports.run = async (client, message, args, settings) => {
             xp: xp
         })
 
-        return embed.run(client, message, `BLUE;; Ajout d'xp réussi !;; Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${xp}`)
+        return message.reply({embeds: [{color: 'BLUE', title: 'Ajout d\'xp réussi !', description: `Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${xp}`}]})
     }
     await client.updateXP(client, member, xp)
 
-    return embed.run(client, message, `BLUE;; Ajout d'xp réussi !;; Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${dbUserMentionned.xp+xp}`)
+    return message.reply({embeds: [{color: 'BLUE', title: 'Ajout d\'xp réussi !', description: `Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${dbUserMentionned.xp+xp}`}]})
 }
 module.exports.help = MESSAGES.Commandes.Moderation.ADDXP;

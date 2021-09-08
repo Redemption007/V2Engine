@@ -28,7 +28,7 @@ module.exports.run = async (client, message) => {
                 if (msge.mentions.roles.first().permissions.has('KICK_MEMBERS')) {
                     return true
                 }
-                msge.reply('Ce n\'a pas le droit de kick des personnes du serveur ! Merci de prendre un rôle qui le puisse.')
+                msge.reply('Ce rôle n\'a pas le droit de kick des personnes du serveur ! Merci de prendre un rôle qui le puisse.')
             }
             msge.reply('Ce rôle n\'appartient pas au serveur !')
         }
