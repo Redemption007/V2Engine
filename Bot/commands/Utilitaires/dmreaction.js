@@ -23,7 +23,7 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
     await message.channel.send(warning)
         .then(async message1 => {
             try {
-                await message1.edit(warning, {embed: {color: 'PURPLE', description: `Quel est le lien du message concerné ?`}})
+                await message1.edit({content: warning, embeds: [{color: 'PURPLE', description: `Quel est le lien du message concerné ?`}]})
 
                 await message.channel.awaitMessages(filterID, {max: 1, idle: 30000})
                     .then(async collected1 => {
@@ -34,13 +34,13 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                         messageID = contenu1[1]
                         await collected1.first().delete()
                     })
-                await message1.edit(warning, {embed: {color: 'PURPLE', description: `> L'id du message est : ${messageID}\n> Le salon concerné est <#${channelID}>.\n\
-                    > Le lien du message est <https://discord.com/channels/${message.guild.id}/${channelID}/${messageID}>.`, fields: [{name: 'Prochaine étape :', value: 'Réagissez avec la réaction que vous souhaitez mettre :'}]}})
+                await message1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> L'id du message est : ${messageID}\n> Le salon concerné est <#${channelID}>.\n\
+                    > Le lien du message est <https://discord.com/channels/${message.guild.id}/${channelID}/${messageID}>.`, fields: [{name: 'Prochaine étape :', value: 'Réagissez avec la réaction que vous souhaitez mettre :'}]}]})
                 await message1.awaitReactions(filterReaction, {max: 1, idle: 30000})
                     .then(collected2 => {
                         Emoji = collected2.first().emoji
                     })
-                await message1.edit(warning, {embed: {color: `PURPLE`, description: `> L'émoji avec lequel réagir est  ${Emoji}`, fields: [{name: 'Prochaine étape :', value: 'Quel est le contenu à envoyer par DM ? (1min pour répondre à cette question)'}]}})
+                await message1.edit({content: warning, embeds: [{color: `PURPLE`, description: `> L'émoji avec lequel réagir est  ${Emoji}`, fields: [{name: 'Prochaine étape :', value: 'Quel est le contenu à envoyer par DM ? (1min pour répondre à cette question)'}]}]})
                 await message1.reactions.removeAll()
                 await message.channel.awaitMessages(filter, {max: 1, idle: 60000})
                     .then(async collected3 => {
@@ -48,13 +48,13 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                         contenuDM = await collected3.first().content
                         await collected3.first().delete()
                     })
-                await message1.edit(warning, {embed: {color: `PURPLE`, description: `> Le contenu envoyé par DM sera :\n:speech_balloon: ${contenuDM}`, fields: [
+                await message1.edit({content: warning, embeds: [{color: `PURPLE`, description: `> Le contenu envoyé par DM sera :\n:speech_balloon: ${contenuDM}`, fields: [
                     {name: 'Prochaine étape :', value: 'Que\
  voulez-vous qu\'il se passe si l\'utilisateur a désactivé les DM sur le serveur ?\n\
 :one: Le contenu est envoyé avec mention sur un salon spécial.\n\
 :two: Une mention est envoyée sur ce salon spécial pour demander à l\'utilisateur d\'autoriser les DM sur le serveur.\n\
 :three: Rien ne se passe.'}
-                ]}})
+                ]}]})
                 message1.react('1️⃣')
                 message1.react('2️⃣')
                 message1.react('3️⃣')
@@ -77,7 +77,7 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                     })
                 await message1.reactions.removeAll()
                 if (dmr === 1 || dmr === 2) {
-                    message1.edit(warning, {embed: {color: 'PURPLE', title: `> Vous avez choisi l'option n°${dmr} :`, description: `${choix}`, fields: [{name: 'Prochaine étape :', value: 'Dans quel salon (#salon) voulez-vous que le message s\'envoie ?'}]}})
+                    message1.edit({content: warning, embeds: [{color: 'PURPLE', title: `> Vous avez choisi l'option n°${dmr} :`, description: `${choix}`, fields: [{name: 'Prochaine étape :', value: 'Dans quel salon (#salon) voulez-vous que le message s\'envoie ?'}]}]})
                     await message.channel.awaitMessages(filterChannel, {max: 1, idle: 30000})
                         .then(async msges => {
                             if (msges.first().content.toLowerCase() === 'cancel') return message1.edit(`La commande a été annulée.`)
@@ -100,7 +100,7 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                     .setTimestamp()
                     .setFooter(`DMReaction exécuté par ${message.author.tag}.`)
 
-                await message.channel.send(embed2)
+                await message.channel.send({embeds: [embed2]})
                 await message1.delete()
                 const messageReactor = await client.getReactor(messageDMR)
 

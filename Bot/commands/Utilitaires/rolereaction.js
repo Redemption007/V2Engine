@@ -18,7 +18,7 @@ module.exports.run = async (client, message) => {
     const filterReaction = reac => reac.users.cache.get(message.author.id) && !reac.me
     const filterRole = mesg => mesg.mentions.roles.lastKey !== 0 && mesg.author.id === message.author.id
 
-    await message.channel.send(warning, {embed: {color: 'PURPLE', description: 'Quel est le lien du message concerné ?'}})
+    await message.channel.send({content: warning, embeds: [{color: 'PURPLE', description: 'Quel est le lien du message concerné ?'}]})
         .then(async msg1 => {
             try {
                 await message.channel.awaitMessages(filterID, {max: 1, idle: 30000})
@@ -30,28 +30,28 @@ module.exports.run = async (client, message) => {
                         messageID = contenu1[1]
                         await collected1.first().delete()
                     })
-                await msg1.edit(warning, {embed: {color: 'PURPLE', description: `> L'id du message est : ${messageID}\n\
+                await msg1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> L'id du message est : ${messageID}\n\
 > Le salon concerné est <#${channelID}>.\n> Le lien du message est <https://discord.com/channels/${message.guild.id}/${channelID}\
-/${messageID}>.`, fields: [{name: 'Prochaine étape :', value: 'Réagissez avec la réaction que vous souhaitez mettre :'}]}})
+/${messageID}>.`, fields: [{name: 'Prochaine étape :', value: 'Réagissez avec la réaction que vous souhaitez mettre :'}]}]})
                 await msg1.awaitReactions(filterReaction, {max: 1, idle: 30000})
                     .then(async collected2 => {
                         Emoji = await collected2.first().emoji
                     })
                 await msg1.reactions.removeAll()
-                await msg1.edit(warning, {embed: {color: 'PURPLE', description: `> L'émoji avec lequel réagir est  ${Emoji}`,
-                    fields: [{name: 'Prochaine étape :', value: 'Mentionnez le rôle concerné (@role) ?'}]}})
+                await msg1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> L'émoji avec lequel réagir est  ${Emoji}`,
+                    fields: [{name: 'Prochaine étape :', value: 'Mentionnez le rôle concerné (@role) ?'}]}]})
                 await message.channel.awaitMessages(filterRole, {max: 1, idle: 30000})
                     .then(async collected3 => {
                         if (collected3.first().content.toLowerCase() === 'cancel') return msg1.edit('La commande a été annulée.')
                         Role = await collected3.first().mentions.roles.first()
                         collected3.first().delete()
                     })
-                await msg1.edit(warning, {embed: {color: 'PURPLE', description: `> Le rôle ajouté/supprimé sera <@&${Role.id}>`,
+                await msg1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> Le rôle ajouté/supprimé sera <@&${Role.id}>`,
                     fields: [{name: 'Prochaine étape :', value: "Quel est l'effet de l'ajout de la réaction ?\n\
 :one: Ajoute le rôle à l'utilisateur.\n\
 :two: Donne le rôle quand l'utilisateur ajoute la réaction, et lui supprime ce rôle quand il l'enlève.\n\
 :three: Retire le rôle à l'utilisateur.\n\
-:four: Supprime le rôle quand l'utilisateur ajoute la réaction, et lui ajoute ce rôle quand il l'enlève."}]}})
+:four: Supprime le rôle quand l'utilisateur ajoute la réaction, et lui ajoute ce rôle quand il l'enlève."}]}]})
                 msg1.react('1️⃣')
                 msg1.react('2️⃣')
                 msg1.react('3️⃣')
@@ -78,7 +78,7 @@ module.exports.run = async (client, message) => {
                         }
                     })
                 await msg1.reactions.removeAll()
-                await msg1.edit(warning, {embed: {color: 'PURPLE', description: `> Vous avez choisi l'option n°${rr} : ${choix}`}})
+                await msg1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> Vous avez choisi l'option n°${rr} : ${choix}`}]})
                 channelRR = await message.guild.channels.cache.get(channelID)
                 messageRR = await channelRR.messages.fetch(messageID)
                 await messageRR.react(Emoji)
@@ -93,7 +93,7 @@ module.exports.run = async (client, message) => {
                     .setTimestamp()
                     .setFooter(`Role Reaction exécuté par ${message.author.tag}.`)
 
-                await message.channel.send(embed2)
+                await message.channel.send({embeds: [embed2]})
                 await msg1.delete()
                 const messageReactor = await client.getReactor(messageRR)
 
@@ -117,7 +117,7 @@ module.exports.run = async (client, message) => {
                     autre: [Role.id]
                 })
             } catch (e) {
-                msg1.edit(canceled)
+                msg1.edit({embeds: [canceled]})
             }
         })
 }

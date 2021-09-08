@@ -4,7 +4,7 @@ module.exports.run = async (client, message) => {
     const guild = await message.guild
     const tournoi = await client.getTournoi({StaffChannelID: message.channel.id})
 
-    if (!tournoi) return message.reply('vous n\'avez pas envoyé cette commande dans un channel staff de tournoi !')
+    if (!tournoi) return message.reply('Vous n\'avez pas envoyé cette commande dans un channel staff de tournoi !')
     const StaffChannel = await guild.channels.cache.get(tournoi.StaffChannelID)
     const InfosChannel = await guild.channels.cache.find(ch => ch.name === 'infos-tournoi' && ch.parentID === StaffChannel.parentID)
     const category = await guild.channels.cache.get(StaffChannel.parentID)

@@ -1,5 +1,5 @@
 const {MESSAGES} = require('../../starterpack/constants')
-const ms = require('ms')
+const ms = require('../../../../ms')
 
 module.exports.run = async (client, message) => {
     const filterReaction = async r => {
@@ -23,7 +23,7 @@ module.exports.run = async (client, message) => {
     if (APILatency > 100 && APILatency < 200) emote1 = '💤'
     if (BotLatency > 200) emote2 = '💢'
     if (BotLatency > 100 && BotLatency < 200) emote2 = '💤'
-    msg.edit(message.author.toString(), {embed: {title: '🕐 Pong !', color: 'PURPLE', fields: [{name: 'Latence du bot :', value: `${emote2} ${BotLatency} millisecondes.`, inline: true}, {name: 'Latence de l\'API de Discord :', value: `${emote1} ${APILatency} millisecondes`, inline: true}]}})
+    msg.edit({content: message.author.toString(), embeds: [{title: '🕐 Pong !', color: 'PURPLE', fields: [{name: 'Latence du bot :', value: `${emote2} ${BotLatency} millisecondes.`, inline: true}, {name: 'Latence de l\'API de Discord :', value: `${emote1} ${APILatency} millisecondes`, inline: true}]}]})
     msg.react('➕')
     msg.awaitReactions(filterReaction, {max: 1, time: 30000})
         .then(async coll => {
@@ -34,7 +34,7 @@ module.exports.run = async (client, message) => {
                 .then(m => joinedTimestamp = m.joinedTimestamp)
             const joined = ms(Date.now() - joinedTimestamp, true)
             //const informations = globalsettings.MaJ        {name: 'Informations de la dernière mise à jour :', value: informations}
-            msg.edit({embed: {title: 'Pong !', color: 'PURPLE', fields: [{name: 'Latence du bot :', value: `${emote2} ${BotLatency} millisecondes.`, inline: true}, {name: 'Latence de l\'API de Discord :', value: `${emote1} ${APILatency} millisecondes`, inline: true}, {name: 'Bot en ligne depuis :', value: time}, {name: "Membre de cette guilde depuis :", value: joined}], footer: {text: 'Les informations supplémentaires ont été affichées', icon_url: client.user.avatarURL()}}})
+            msg.edit({embeds: [{title: 'Pong !', color: 'PURPLE', fields: [{name: 'Latence du bot :', value: `${emote2} ${BotLatency} millisecondes.`, inline: true}, {name: 'Latence de l\'API de Discord :', value: `${emote1} ${APILatency} millisecondes`, inline: true}, {name: 'Bot en ligne depuis :', value: time}, {name: "Membre de cette guilde depuis :", value: joined}], footer: {text: 'Les informations supplémentaires ont été affichées', icon_url: client.user.avatarURL()}}]})
             return msg.reactions.removeAll()
         })
 }

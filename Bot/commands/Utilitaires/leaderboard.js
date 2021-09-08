@@ -25,7 +25,7 @@ module.exports.run = async (client, message) => {
     })
     leaderboard.addField('Utilisateurs', Utilisateurs, true)
     leaderboard.addField('Niveaux', Niveaux, true)
-    message.channel.send(leaderboard)
+    message.channel.send({embeds: [leaderboard]})
         .then(async lb => {
             const filter = reaction => !reaction.me && (reaction.emoji.name === '◀️'||reaction.emoji.name === '⏹️'||reaction.emoji.name === '▶️')
             const collector = await lb.createReactionCollector(filter, {idle: 30000})
@@ -69,7 +69,7 @@ module.exports.run = async (client, message) => {
                     })
                     break
                 }
-                await lb.edit({embed: {
+                await lb.edit({embeds: [{
                     color: 'DARK_RED',
                     title: 'Classement des utilisateurs du serveur',
                     fields: [
@@ -77,15 +77,15 @@ module.exports.run = async (client, message) => {
                         {name: 'Niveaux', value: Niveaux, inline: true}
                     ],
                     footer: {text: `Classement demandé par ${message.author.tag}. Page ${Page+1}/${Nbpages}`}
-                }})
+                }]})
             })
             collector.on('end', async r => {
                 await r.message.reactions.removeAll()
-                lb.edit({embed: {
+                lb.edit({embeds: [{
                     color: 'RED',
                     description: "Merci d'utiliser une nouvelle fois la commande si vous voulez voir le classement.",
                     footer: {text: 'Eh oui ! Tout à une fin...'}
-                }})
+                }]})
             });
         })
 

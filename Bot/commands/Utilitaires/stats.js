@@ -1,8 +1,6 @@
 const {MESSAGES} = require('../../starterpack/constants')
 
-const embed = require('./embed')
-
-module.exports.run = (client, message) => {
+module.exports.run = (_client, message) => {
     message.guild.members.fetch().then(AllMembers => {
         const offline = AllMembers.filter(member => member.presence.status === "offline" && !member.user.bot)
         const idle = AllMembers.filter(member => member.presence.status === 'idle' && !member.user.bot)
@@ -10,9 +8,7 @@ module.exports.run = (client, message) => {
         const online = AllMembers.filter(member => member.presence.status === 'online' && !member.user.bot)
         const bots = AllMembers.filter(member => member.user.bot)
 
-        embed.run(client, message, `LUMINOUS_VIVID_PINK;; Présence globale :;; Il y a actuellement ${AllMembers.size - bots.size}\
- personnes sur ce serveur dont :\n- ${online.size} connectées.\n- ${dnd.size} en mode "Ne pas déranger".\
- \n - ${idle.size} AFK.\n- ${offline.size} déconnectées.\n\n*Ce serveur héberge en plus ${bots.size} bots.*`)
+        message.channel.send({embeds: [{title: "Présence globale :", color: 'LUMINOUS_VIVID_PINK', description: `Il y a actuellement ${AllMembers.size - bots.size} personnes sur ce serveur dont :\n- ${online.size} connectées.\n- ${dnd.size} en mode "Ne pas déranger".\n - ${idle.size} AFK.\n- ${offline.size} déconnectées.\n\n*Ce serveur héberge en plus ${bots.size} bots.*`}]})
     })
 }
 module.exports.help = MESSAGES.Commandes.Utilitaires.STATS;

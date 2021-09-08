@@ -5,7 +5,7 @@ module.exports.run = async (client, message) => {
     let tournoi = await client.getTournoi({InscriptionsChannelID: message.channel.id})
 
     if (!tournoi) tournoi = await client.getTournoi({StaffChannelID: message.channel.id})
-    if (!tournoi) return message.reply("vous n'avez pas envoyé cette commande dans la catégorie d'un tournoi !")
+    if (!tournoi) return message.reply("Vous n'avez pas envoyé cette commande dans la catégorie d'un tournoi !")
     let Description = ''
     const DateInscriptions = tournoi.InscriptionsDate.valueOf()
     const FinInscriptions = tournoi.Date.valueOf()-tournoi.InscriptionsFin
@@ -19,10 +19,10 @@ module.exports.run = async (client, message) => {
     \n\nDébut du tournoi dans :\n> ${ms(tournoi.Date.valueOf()-Date.now(), true)}`
     Description += `\n\nFin du tournoi dans :\n> ${ms(duration, true)}`
 
-    message.reply({embed: {
+    message.reply({embeds: [{
         color: 'AQUA',
         title: `Timers du tournoi ${tournoi.NomduTournoi} :`,
         description: Description,
-    }})
+    }]})
 }
 module.exports.help = MESSAGES.Commandes.Tournaments.TIMER;

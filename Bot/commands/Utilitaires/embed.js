@@ -15,10 +15,10 @@ module.exports.run = (client, message, args) => {
     try {
         embed.setFooter(`Intégration écrite par ${message.author.username}`, message.author.displayAvatarURL())
     } catch (e) {
-        return message.send(embed)
+        return message.send({embeds: [embed]})
     }
 
-    return message.channel.send(embed)
+    return message.channel.send({embeds: [embed]})
 }
 module.exports.help = MESSAGES.Commandes.Utilitaires.EMBED;
 
