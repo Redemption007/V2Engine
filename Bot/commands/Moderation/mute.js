@@ -1,5 +1,5 @@
 const {MESSAGES} = require('../../starterpack/constants')
-const ms = require('ms');
+const ms = require('../../../../ms');
 
 module.exports.run = async (client, message, args, settings) => {
 
@@ -7,21 +7,6 @@ module.exports.run = async (client, message, args, settings) => {
 
     const TimeMute = args[1]
     let raison = args.splice(2).join(' ') || 'Aucune raison spécifiée.';
-    /*const array = [
-        'années', 'annnée', 'ans', 'an', 'a',
-        'weeks', 'week', 'w',
-        'jours', 'jour', 'j',
-        'heures', 'heure', 'hrs', 'hr', 'h',
-        'minutes', 'minute', 'mins', 'min', 'm',
-        'secondes', 'seconde', 'secs', 'sec', 's'
-    ]
-
-    //Parcours du tableau des aliases
-    for (let i=0; i<27; i++) {
-        verif = TimeMute.toLowerCase().endsWith(array[i]);
-        if (verif) i=30
-    }
-    */
 
     if (!ms(TimeMute)) raison = args[1] + ' ' + raison || 'Aucune raison spécifiée.';
 
