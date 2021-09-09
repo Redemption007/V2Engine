@@ -6,13 +6,13 @@ module.exports.run = async (client, message, _args, settings) => {
     const StaffChannel = await message.guild.channels.cache.find(ch => ch.name === 'staff-tournoi' && ch.parentID === message.channel.parentID)
     const tournoi = await client.getTournoi({StaffChannelID: StaffChannel.id})
     if (!tournoi) return message.reply('Vous ne pouvez pas effectuer cette commande en dehors d\'un lobby d\'un tournoi en cours.')
-    const filterReaction = reac => reac.users.cache.get(message.author.id) && !reac.me && ['✅', '🔄', '❌'].includes(reac._emoji.name)
+    const filterReaction = reac => reac.users.cache.get(message.author.id) && ['✅', '🔄', '❌'].includes(reac._emoji.name)
 
     const msg = await message.reply({embeds: [{title: 'Confirmation des résultats', color: 'AQUA', description: `> Assurez-vous d'avoir pris au moins un screenshot par match disputé.\n\n**__Voici les étapes pour procéder à l'envoi des résultats :__**\n\`1 -\` Celui qui a fait la commande doit envoyer les captures d'écran dans ce lobby.\n\`2 -\` Une fois tous les screens envoyés, réagissez par ce message avec ✅\n\`3 -\` Attendez de recevoir la confirmation de ces résultats.\n\`4 -\` Une fois vos résultats confirmés, attendez patiemment que les autres lobbys valident les leurs. Ce lobby sera alors supprimé et d'autres lobbys seront créés, jusqu'à la finale.\n\n:warning: Si vous vous êtes trompé pendant l'exécution de cette commande, réagissez avec 🔄 à ce message avec pour relancer la commande (__*Supprimer les messages ne sert à rien*__).\n❌ Pour annuler la commande.`, footer: {text: 'Vous avez 2 minutes pour confirmer vos résultats, après quoi la commande sera annulée.'}}]})
     msg.react('✅')
     msg.react('🔄')
     msg.react('❌')
-    await msg.awaitReactions(filterReaction, {max: 1, idle: 120000})
+    await msg.awaitReactions({filterReaction, max: 1, idle: 120000})
         .then(async coll => {
             const emoji = coll.first()._emoji.name
 

@@ -5,7 +5,7 @@ module.exports.run = async (client, message, _args, settings) => {
 
     if (!tournoi) tournoi = await client.getTournoi({InscriptionsChannelID: message.channel.id})
     const member = await message.mentions.members.first()
-    const filterReaction = reaction => reaction.users.fetch(message.author.id) && !reaction.me
+    const filterReaction = reaction => reaction.users.fetch(message.author.id) && ['✅', '❌'].includes(reaction._emoji.name)
 
     if (!member) return message.reply(`Vous devez mentionner un utilisateur pour cette commande ! Utilisation de la commande : ${settings.prefix}forceunregister @user`)
     if (!tournoi) return message.reply('Vous n\'avez pas envoyé cette commande dans le salon staff du tournoi concerné !')
@@ -14,7 +14,7 @@ module.exports.run = async (client, message, _args, settings) => {
         .then(async msg => {
             msg.react('✅')
             msg.react('❌')
-            await msg.awaitReactions(filterReaction, {max: 1, idle: 30000, errors: ['time']})
+            await msg.awaitReactions({filterReaction, max: 1, idle: 30000, errors: ['time']})
                 .then(async coll => {
                     const emoji = await coll.first()._emoji.name
 

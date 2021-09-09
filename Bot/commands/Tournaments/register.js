@@ -15,7 +15,7 @@ module.exports.run = async (client, message, _args, settings) => {
         const code_team = reac._emoji.name === '👥'
         const searching = reac._emoji.name === '🔎' && places
         const creating = reac._emoji.name === '🆕' && !maxed
-        return !reac.me && ( code_team || searching || creating)
+        return reac.users.cache.size>1 && ( code_team || searching || creating)
     }
     const filterNumber = async msg => {
         if (msg.author.id !== message.author.id) return false
@@ -50,7 +50,7 @@ module.exports.run = async (client, message, _args, settings) => {
         }
         try {
             await msg.edit({embeds: [{title: 'Inscription : Etape 1', color: 'BLUE', description: 'Merci de renseigner votre pseudo de jeu :', footer: {text: 'Vous avez 1 minute maximum pour répondre à cette question.'}}]})
-            await msg.channel.awaitMessages(filter, {max: 1, time: 30000})
+            await msg.channel.awaitMessages({filter, max: 1, time: 30000})
                 .then(coll => {
                     pseudo = coll.first().content
                 })
@@ -65,14 +65,14 @@ module.exports.run = async (client, message, _args, settings) => {
             if (tournoi.Inscrits.length) msg.react('👥')
             if (places) msg.react('🔎')
             if (!maxed) msg.react('🆕')
-            await msg.awaitReactions(filterReaction, {max: 1, time: 300000})
+            await msg.awaitReactions({filterReaction, max: 1, time: 300000})
                 .then(async coll => {
                     choix = await coll.first()._emoji.name
                 })
             switch (choix) {
             case '👥':
                 await message.author.send({embeds: [{title: 'Inscription : Etape 2', description: 'Merci de renseigner votre code d\'équipe :', footer: {text: 'Vous avez 1 minute maximum pour répondre à cette question.'}}]})
-                await msg.channel.awaitMessages(filterNumber, {max: 1, idle: 30000, errors: 'time'})
+                await msg.channel.awaitMessages({filterNumber, max: 1, idle: 30000, errors: 'time'})
                     .then(async collected => {
                         const team = await tournoi.Inscrits.find(teaam => teaam.id === +collected.first().content)
                         if (team) {
@@ -86,7 +86,7 @@ module.exports.run = async (client, message, _args, settings) => {
                 break
             case '🔎':
                 await message.author.send({embeds: [{title: 'Inscription : Etape 2', description: "Merci d'écrire une courte description de votre profil :", footer: {text: "Vous avez 2 minute pour répondre à cette question."}, timestamp: Date.now()}]})
-                await msg.channel.awaitMessages(filter, {max: 1, idle: 120000, errors: 'time'})
+                await msg.channel.awaitMessages({filter, max: 1, idle: 120000, errors: 'time'})
                     .then(async msgs => {
                         profil = await msgs.first().content
                         return client.askTeam(tournoi, {id: message.author.id, pseudo: pseudo, speech: profil})
@@ -118,7 +118,7 @@ module.exports.run = async (client, message, _args, settings) => {
             color: 'ORANGE'
         }]})
             .then(mesg => msg = mesg)
-        await message.channel.awaitMessages(filter, {max: 1, idle: 30000, errors: 'time'})
+        await message.channel.awaitMessages({filter, max: 1, idle: 30000, errors: 'time'})
             .then(async coll => {
                 pseudo = await coll.first().content
                 coll.first().delete()

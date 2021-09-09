@@ -11,7 +11,7 @@ module.exports.run = async (client, message) => {
     const InfosChannel = message.guild.channels.cache.find(ch => ch.name === 'infos-tournoi' && ch.parentID === StaffChannel.parentID)
     const filterMessages = m => m.author.id === message.author.id
     const filterClassement = r => r.users.fetch(message.author.id) && !r.me && ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣'].includes(r._emoji.name)
-    const filterReaction = r => !r.me && r.users.fetch(message.author.id) && ['✅', '❌'].includes(r._emoji.name)
+    const filterReaction = r => r.users.cache.size>1 && r.users.fetch(message.author.id) && ['✅', '❌'].includes(r._emoji.name)
     let classement = 3
     let desc = ''
     let field = ''
@@ -27,7 +27,7 @@ module.exports.run = async (client, message) => {
         msgclassement.react('3️⃣')
         msgclassement.react('4️⃣')
         msgclassement.react('5️⃣')
-        await msgclassement.awaitReactions(filterClassement, {max: 1, time: 30000})
+        await msgclassement.awaitReactions({filterClassement, max: 1, time: 30000})
             .then(reaction => {
                 switch(reaction.first()._emoji.name) {
                 case '1️⃣':
@@ -54,7 +54,7 @@ module.exports.run = async (client, message) => {
         try {
             for (let i=0; i<classement; i++) {
                 msgclassement.edit({embeds: [{description: `Quelle est l'ID de l'équipe qui remporte ce tournoi ? (${i+1}${i<1?'ère':'ème'} place)`}]})
-                await message.channel.awaitMessages(filterMessages, {max: 1, time: 30000})
+                await message.channel.awaitMessages({filterMessages, max: 1, time: 30000})
                     .then(async coll => {
                         const tid = coll.first().content.replace(/^<@!/, '').replace(/>$/, '')
                         const team = await tournoi.Inscrits.find(tm => {
@@ -96,7 +96,7 @@ module.exports.run = async (client, message) => {
         return parent && name
     }
     await message.reply({embeds: [{description: `Donnez les ID d'${tournoi.Compo<2? 'utilisateurs' : 'équipes'} que vous voulez déclarer vainqueurs.\nSchéma : \`<id1> <id2> <id3> <etc>\``, color: 'PURPLE'}]})
-    await message.channel.awaitMessages(filterMessages, {max: 1, time: 30000})
+    await message.channel.awaitMessages({filterMessages, max: 1, time: 30000})
         .then(coll => team_ids = coll.first().content.trim().split(' '))
         .catch(() => { error = true })
     if (error) return message.reply('La commande est annulée car vous avez mis trop de temps à répondre.')
@@ -135,7 +135,7 @@ module.exports.run = async (client, message) => {
     const mesg = await message.reply({embeds: [{color: 'ORANGE', title: `Confirmez vous déclarer gagnant${tournoi.Compo>2?'e':''}s ces ${tournoi.Compo<2? 'utilisateurs':'équipes'} ?`, fields: [{name: 'IDs :', value: ids, inline: true}, {name: 'Lobbys concernés :', value: lobbys, inline: true}], footer: {text: 'Vous avez 30 secondes pour confirmer', icon_url: message.author.avatarURL()}}]})
     mesg.react('✅')
     mesg.react('❌')
-    await mesg.awaitReactions(filterReaction, {max: 1, time: 30000})
+    await mesg.awaitReactions({filterReaction, max: 1, time: 30000})
         .then(coll => coll.first()._emoji.name === '✅')
         .catch(() => { error = true })
     if (error) return message.reply('La commande a été annulée.')

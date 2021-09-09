@@ -30,7 +30,7 @@ module.exports = client => {
                 await team.members.forEach(async member => {
                     const Member = await guild.members.fetch(member.userid)
 
-                    await Member.send({embed: {title: 'Un membre a rejoint votre team !', description: `<@${newcomer.id}> (${newcomer.tag}) a rejoint votre équipe !\nPseudo de jeu : ${one.pseudo}`, color: 'DARK_GREEN', footer: {text: `Nombre de personnes dans l'équipe : ${team.members.length+1}/${tournoi.Compo}`}}})
+                    await Member.send({embeds: [{title: 'Un membre a rejoint votre team !', description: `<@${newcomer.id}> (${newcomer.tag}) a rejoint votre équipe !\nPseudo de jeu : ${one.pseudo}`, color: 'DARK_GREEN', footer: {text: `Nombre de personnes dans l'équipe : ${team.members.length+1}/${tournoi.Compo}`}}]})
                 })
                 team.members.push({userid: one.id, pseudo: one.pseudo})
 
@@ -51,7 +51,7 @@ module.exports = client => {
         incompletes.forEach(async team => {
             const chef = await guild.members.fetch(team.members.first().userid)
 
-            await chef.send({embed: {color: 'PURPLE', title: 'Un membre demande à vous rejoindre !', description: `Sur le serveur ${guild.name}, à propos du tournoi ${tournoi.NomduTournoi} ;\n> <@${one.userid}> (tag : ${random.user.tag}, pseudo de jeu : ${one.pseudo}) veut vous rejoindre ! Voici sa courte présentation :\n:speech_balloon: ${one.speech}`, footer: {text: 'Vous avez 24h pour répondre à cette proposition. Si réagir à ce message n\'a pas d\'effet, c\'est que le membre est déjà dans une équipe.'}, timestamp: Date.now()}})
+            await chef.send({embeds: [{color: 'PURPLE', title: 'Un membre demande à vous rejoindre !', description: `Sur le serveur ${guild.name}, à propos du tournoi ${tournoi.NomduTournoi} ;\n> <@${one.userid}> (tag : ${random.user.tag}, pseudo de jeu : ${one.pseudo}) veut vous rejoindre ! Voici sa courte présentation :\n:speech_balloon: ${one.speech}`, footer: {text: 'Vous avez 24h pour répondre à cette proposition. Si réagir à ce message n\'a pas d\'effet, c\'est que le membre est déjà dans une équipe.'}, timestamp: Date.now()}]})
                 .then(async msg => {
                     await msg.react('✅')
                     await msg.react('❌')
@@ -116,7 +116,7 @@ module.exports = client => {
                     await newlist[index].members.forEach(async mbr => {
                         const user = await guild.members.cache.get(mbr.userid)
 
-                        await user.send({embed: {title: 'Oops !', color: 'RED', description: "Par manque de participants, votre équipe n'était pas complète. Les équipes incomplètes n'étant pas autorisées, vous avez été désinscrit du tournoi.", footer: {text: "La précision de l'interdiction des équipes incomplètes a été précisée avant le début du tournoi : soyez plus prévoyant la prochaine fois !"}, timestamp: Date.now()}})
+                        await user.send({embeds: [{title: 'Oops !', color: 'RED', description: "Par manque de participants, votre équipe n'était pas complète. Les équipes incomplètes n'étant pas autorisées, vous avez été désinscrit du tournoi.", footer: {text: "La précision de l'interdiction des équipes incomplètes a été précisée avant le début du tournoi : soyez plus prévoyant la prochaine fois !"}, timestamp: Date.now()}]})
                     })
                     await newlist.splice(index, 1)
                 })
@@ -173,7 +173,7 @@ module.exports = client => {
                 await newlist[index].members.forEach(async mbr => {
                     const user = await guild.members.cache.get(mbr.userid)
 
-                    await user.send({embed: {title: 'Oops !', color: 'RED', description: "Par manque de participants, votre équipe n'était pas complète. Les équipes incomplètes n'étant pas autorisées, vous avez été désinscrit du tournoi.\nNous nous excusons de la gêne occasionnée.", footer: {text: "Cette désinscription a été faite au hasard par le bot, l'équipe de modération n'a donc rien à voir avec ceci."}, timestamp: Date.now()}})
+                    await user.send({embeds: [{title: 'Oops !', color: 'RED', description: "Par manque de participants, votre équipe n'était pas complète. Les équipes incomplètes n'étant pas autorisées, vous avez été désinscrit du tournoi.\nNous nous excusons de la gêne occasionnée.", footer: {text: "Cette désinscription a été faite au hasard par le bot, l'équipe de modération n'a donc rien à voir avec ceci."}, timestamp: Date.now()}]})
                 })
                 await newlist.splice(index, 1)
             }

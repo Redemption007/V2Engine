@@ -23,7 +23,7 @@ module.exports = async (client, channel) => {
         .setFooter(`Type de salon : ${channel.type}`)
         .setTimestamp();
 
-    client.channels.cache.get(client.config.CHANNELLOGID).send(log)
+    client.channels.cache.get(client.config.CHANNELLOGID).send({embeds: [log]})
 
     const reactors = await Reactor.find(r => r && channel.id === r.channelID)
     if (reactors.length) {
@@ -41,7 +41,7 @@ module.exports = async (client, channel) => {
             else {
                 const settings = await client.getGuild({guildID: channel.guild.id})
                 senders[j].channelsending = settings.generalChannel
-                client.channels.cache.get(client.config.CHANNELLOGID).send({embed: {title: 'ATTENTION !', color: 'RED', fields: [{name: '', value: `Un réacteur a été modifié, en raison de la suppression du channel ${channel.name}`}, {name: 'Nouveau salon d\'envoi des informations :', value: `<#${settings.generalChannel}> (ID: ${settings.generalChannel})`}], footer: {text: 'Pour changer le salon d\'envoi des informations, faites !changereactor ou !cr'}, timestamp: Date.now()}})
+                client.channels.cache.get(client.config.CHANNELLOGID).send({embeds: [{title: 'ATTENTION !', color: 'RED', fields: [{name: '', value: `Un réacteur a été modifié, en raison de la suppression du channel ${channel.name}`}, {name: 'Nouveau salon d\'envoi des informations :', value: `<#${settings.generalChannel}> (ID: ${settings.generalChannel})`}], footer: {text: 'Pour changer le salon d\'envoi des informations, faites `!changereactor` ou `!cr`'}, timestamp: Date.now()}]})
             }
             await senders[j].save()
         }

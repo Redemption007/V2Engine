@@ -13,7 +13,7 @@ module.exports = async (client, channel) => {
     if (!RoleMute) RoleMute = await channel.guild.roles.cache.find(r => r.name === 'Muted');
 
     if (RoleMute) {
-        await channel.createOverwrite(RoleMute, {
+        await channel.permissionOverwrites.create(RoleMute, {
             SEND_MESSAGES: false,
             ADD_REACTIONS: false,
             CONNECT: false
@@ -29,5 +29,5 @@ module.exports = async (client, channel) => {
         .setFooter(`Type de salon : ${channel.type}`)
         .setTimestamp();
 
-    client.channels.cache.get(client.config.CHANNELLOGID).send(log)
+    client.channels.cache.get(client.config.CHANNELLOGID).send({embeds: [log]})
 }

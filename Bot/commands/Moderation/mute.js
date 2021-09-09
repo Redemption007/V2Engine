@@ -57,6 +57,7 @@ module.exports.run = async (client, message, args, settings) => {
     //UNMUTE PROGRAMMÉ :
 
     client.clock( async (mssage, mmbr, RoleMuteID) => {
+        if (!mmbr.roles.cache.has(RoleMuteID)) return
         await mmbr.roles.remove(RoleMuteID)
         await mssage.channel.send({embeds: [{title: 'Libéré, délivré(e)...', description: `<@${mmbr.id}> peut à nouveau parler sur le serveur !`, color: 'GREEN', fields: [{name: 'Raison du unmute :', description: `Le temps (${ms(ms(TimeMute), true)}) est écoulé.`}], timestamp: Date.now()}]})
         await client.channels.fetch(settings.logChannel).send({embeds: [{title: 'UNMUTE', color: 'GREEN', description: `<@${mmbr}> a été unmute car le temps (${ms(ms(TimeMute), true)}) est écoulé.`, timestamp: Date.now()}]})

@@ -3,7 +3,7 @@ const ms = require('../../../../ms')
 
 module.exports.run = async (client, message) => {
     const filterReaction = async r => {
-        if (r.me || r._emoji.name !== '➕') return false
+        if (r.users.cache.size<2 || r._emoji.name !== '➕') return false
         let admin = false
         const user = await r.users.cache.find(usr => !usr.bot)
         await message.guild.members.fetch(user.id)
@@ -25,7 +25,7 @@ module.exports.run = async (client, message) => {
     if (BotLatency > 100 && BotLatency < 200) emote2 = '💤'
     msg.edit({content: message.author.toString(), embeds: [{title: '🕐 Pong !', color: 'PURPLE', fields: [{name: 'Latence du bot :', value: `${emote2} ${BotLatency} millisecondes.`, inline: true}, {name: 'Latence de l\'API de Discord :', value: `${emote1} ${APILatency} millisecondes`, inline: true}]}]})
     msg.react('➕')
-    msg.awaitReactions(filterReaction, {max: 1, time: 30000})
+    msg.awaitReactions({filterReaction, max: 1, time: 30000})
         .then(async coll => {
             if (!coll.first()) return msg.reactions.removeAll()
             const time = ms(Date.now() - client.readyTimestamp, true)

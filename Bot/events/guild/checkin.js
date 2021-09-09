@@ -1,10 +1,12 @@
+const {Util} = require("discord.js")
+
 module.exports = async (client, tournoiid) => {
     const tournoi = await client.getTournoi({_id: tournoiid})
     const settings = await client.getGuild({id: tournoi.guildID})
     const StaffChannel = await client.channels.cache.get(tournoi.StaffChannelID)
     const InfosChannel = await client.channels.cache.find(ch => ch.name === "infos-tournoi" && ch.parentID === StaffChannel.parentID)
     const filterCheckin = async (reaction, user) => {
-        if (reaction.me && reaction.name !== '✅') return reaction.users.remove(user)
+        if (reaction.name !== '✅') return reaction.users.remove(user)
         const reactionneur = await reaction.message.guild.members.fetch(user)
         const have_the_role = await reactionneur.roles.cache.get(tournoi.RoleTournoi)
         return have_the_role
@@ -17,7 +19,7 @@ module.exports = async (client, tournoiid) => {
     const message = await InfosChannel.send(`Début du check-in ! <@&${tournoi.RoleTournoi}>`, {embed: {title: 'Réagissez pour confirmer', color: 'ORANGE', footer: {text: "L'équipe de modération du serveur se réserve le droit de vous refuser l'accès au tournoi à tout moment"}, description: `Si vous ne cochez pas la réaction ✅ ci-dessous, vous serez automatiquement disqualifié du tournoi.\n\n__**Fin du checkin à :**__ *${tournoi.Date.getHours()} heures et ${tournoi.Date.getMinutes()} minutes.*`}})
     await message.react('✅')
 
-    const checkinCollector = message.createReactionCollector(filterCheckin, {time: 300000})
+    const checkinCollector = message.createReactionCollector({filterCheckin, time: 300000})
     checkinCollector.on('collect', (reaction, user) => {
         try {
             let FOOTER
@@ -34,7 +36,7 @@ module.exports = async (client, tournoiid) => {
         reaction.users.remove(user)
     })
     checkinCollector.on('end', async collection => {
-        collection.delete('705476031162613790')
+        collection.delete(client.user.id)
         message.reactions.removeAll()
         if (checkedUsers.length<2) return message.channel.send('Pas assez de monde ne s\'est inscrit ; Le tournoi est donc annulé !')
         await checkedUsers.forEach(usr => message.guild.members.cache.get(usr).send({embed: {color: 'GREEN', title: "Le tournoi commence maintenant !"}}))
@@ -46,7 +48,7 @@ module.exports = async (client, tournoiid) => {
                 inscrits += `<@${e.members[0].userid}> --\n`
                 pseudos += `--> ${e.members[0].pseudo}\n`
             });
-            await StaffChannel.send({embed: {title: `Liste des participants au tournoi ${tournoi.NomduTournoi} :`, color: 'BLUE', fields: [{name: 'Participants :', value: inscrits, inline: true}, {name: 'Peudos de jeu :', value: pseudos, inline: true}]}, split: true})
+            await StaffChannel.send({embeds: [{title: `Liste des participants au tournoi ${tournoi.NomduTournoi} :`, color: 'BLUE', fields: [{name: 'Participants :', value: Util.splitMessage(inscrits), inline: true}, {name: 'Peudos de jeu :', value: Util.splitMessage(pseudos), inline: true}]}]})
         } else {
             if (tournoi.Random) list = await client.randomTeams(tournoi)
             await list.forEach(async e => {
@@ -57,14 +59,14 @@ module.exports = async (client, tournoiid) => {
                     pseudos += `--> ${mbr.pseudo}\n`
                 })
             });
-            await StaffChannel.send({embed: {
+            await StaffChannel.send({embeds: [{
                 title: `Liste des participants au tournoi ${tournoi.NomduTournoi} :`,
                 color: 'BLUE',
                 fields: [
-                    {name: 'Équipes :', value: inscrits, inline: true},
-                    {name: 'Peudos de jeu :', value: pseudos, inline: true}
+                    {name: 'Équipes :', value: Util.splitMessage(inscrits), inline: true},
+                    {name: 'Peudos de jeu :', value: Util.splitMessage(pseudos), inline: true}
                 ]
-            }, split: true})
+            }]})
         }
 
         return client.emit('createlobbys', tournoi)

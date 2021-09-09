@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-return */
 const {MessageEmbed} = require('discord.js')
-const embed = require('../../commands/Utilitaires/embed')
 
 module.exports = async (client, MessageReaction, user) => {
     if (MessageReaction.partial) await MessageReaction.fetch()
@@ -27,12 +26,10 @@ module.exports = async (client, MessageReaction, user) => {
                 case 'DM':
                     if (!DMable) {
                         if (messageReactor.typeAction[i] === 2 || messageReactor.typeAction[i] === 3) {
-                            await embed.run(client, MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]), `RED;; Hélas !;; <@${user.id}> vous avez interdit au bot de vous DM.\
-Ces informations n'étant disponibles qu'en MP, merci de les activer si vous souhaitez recevoir les informations supplémentaires demandées.`)
+                            await MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]).send(`Hélas ! <@${user.id}> vous avez interdit au bot de vous DM. Ces informations n'étant disponibles qu'en MP, merci de les activer si vous souhaitez recevoir les informations supplémentaires demandées.`)
                         }
                         if (messageReactor.typeAction[i] === 1) {
-                            await embed.run(client, MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]), `YELLOW;; Ici !;; <@${user.id}> vous avez interdit au bot de vous DM.\
-Voici donc les informations demandées :\n\n> ${messageReactor.autre[i]}`)
+                            await MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]).send({content: `<@${user.id}> vous avez interdit au bot de vous DM. Voici donc les informations demandées :`, embeds: [{color: 'RED', description: `> ${messageReactor.autre[i]}`}]})
                         }
                     }
                     try {
@@ -46,16 +43,13 @@ Voici donc les informations demandées :\n\n> ${messageReactor.autre[i]}`)
                         await member.send(DM)
                     } catch (e) {
                         if (messageReactor.typeAction[i] === 2) {
-                            await embed.run(client, MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]), `RED;; Hélas !;; <@${user.id}> vos DM ne sont pas activés.\
-    Merci de les activer si vous souhaitez recevoir les informations supplémentaires demandées.`)
+                            await MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]).send(`Hélas ! <@${user.id}> vos DM ne sont pas activés. Merci de les activer si vous souhaitez recevoir les informations supplémentaires demandées.`)
                         }
                         if (messageReactor.typeAction[i] === 1) {
-                            await embed.run(client, MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]), `YELLOW;; Ici !;; <@${user.id}> vos DM ne sont pas activés.\
-    Voici les informations demandées :\n\n> ${messageReactor.autre[i]}`)
+                            await MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]).send({content: ` <@${user.id}> vos DM ne sont pas activés. Voici les informations demandées :`, embeds: [{color: 'YELLOW', description: `> ${messageReactor.autre[i]}`}]})
                         }
                         if (messageReactor.typeAction[i] === 3) {
-                            await embed.run(client, MessageReaction.message.guild.channels.cache.get(client.config.CHANNELLOGID), `RED;; Encore un !;; ${user.nickname} (${user.username} ;\
-    <@${user.id}>) a essayé d'obtenir des informations de ce message : https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}> mais a échoué car ses DMs ne sont pas activés..`)
+                            await MessageReaction.message.guild.channels.cache.get(messageReactor.channelsending[i]).send({embeds: [{color: 'RED', title: 'Encore un !', description: `${user.nickname} (${user.username} ; <@${user.id}>) a essayé d'obtenir des informations de ce message : https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}> mais a échoué car ses DMs ne sont pas activés..`}]})
                         }
                     }
                     await MessageReaction.users.remove(user)
@@ -69,7 +63,7 @@ Voici donc les informations demandées :\n\n> ${messageReactor.autre[i]}`)
                         if (DMable) {
                             const Role = await message.guild.roles.cache.get(messageReactor.autre[i])
 
-                            user.send({embed:{description: `Le rôle <@&${Role.name}> vous a bien été ajouté.`, color:'GOLD'}}).catch(e => { return })
+                            user.send({embeds: [{description: `Le rôle <@&${Role.name}> vous a bien été ajouté.`, color:'GOLD'}]}).catch(e => { return })
                         }
                         break
                     case 2:
@@ -77,7 +71,7 @@ Voici donc les informations demandées :\n\n> ${messageReactor.autre[i]}`)
                         if (DMable) {
                             const Role = await message.guild.roles.cache.get(messageReactor.autre[i])
 
-                            user.send({embed:{description: `Le rôle <@&${Role.name}> vous a bien été ajouté.`, color:'GOLD'}}).catch(e => { return })
+                            user.send({embeds: [{description: `Le rôle <@&${Role.name}> vous a bien été ajouté.`, color:'GOLD'}]}).catch(e => { return })
                         }
                         break
                     case 3:
@@ -87,7 +81,7 @@ Voici donc les informations demandées :\n\n> ${messageReactor.autre[i]}`)
                         if (DMable) {
                             const Role = await message.guild.roles.cache.get(messageReactor.autre[i])
 
-                            user.send({embed:{description: `Le rôle <@&${Role.name}> vous a bien été enlevé.`, color:'GOLD'}}).catch(e => { return })
+                            user.send({embeds: [{description: `Le rôle <@&${Role.name}> vous a bien été enlevé.`, color:'GOLD'}]}).catch(e => { return })
                         }
                         break
                     case 4:
@@ -96,7 +90,7 @@ Voici donc les informations demandées :\n\n> ${messageReactor.autre[i]}`)
                         if (DMable) {
                             const Role = await message.guild.roles.cache.get(messageReactor.autre[i])
 
-                            user.send({embed:{description: `Le rôle <@&${Role.name}> vous a bien été enlevé.`, color:'GOLD'}}).catch(e => { return })
+                            user.send({embeds: [{description: `Le rôle <@&${Role.name}> vous a bien été enlevé.`, color:'GOLD'}]}).catch(e => { return })
                         }
                         break
                     }

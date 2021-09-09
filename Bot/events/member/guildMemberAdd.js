@@ -7,9 +7,9 @@ module.exports = async (client, member) => {
         .setColor('GREEN')
         .setTimestamp()
 
-    await member.send({embed: {title: 'Bienvenue à toi !', color: 'GREEN', description: `Bonjour <@${member.id}> !\nBienvenue dans le serveur ${member.guild.name}.`}})
+    await member.send({embeds: [{title: 'Bienvenue à toi !', color: 'GREEN', description: `Bonjour <@${member.id}> !\nBienvenue dans le serveur ${member.guild.name}.`}]})
         .catch(() => log.setFooter(`Je n'ai pas réussi à joindre par DM l'utilisateur ${member.user.tag} pour son arrivée sur le serveur.`))
-    client.channels.cache.get(client.config.CHANNELLOGID).send(log)
+    client.channels.cache.get(client.config.CHANNELLOGID).send({embeds: [log]})
         
     const dbUser = await client.getUser(member)
 
