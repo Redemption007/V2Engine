@@ -1,7 +1,10 @@
 const {MESSAGES} = require('../../starterpack/constants')
 
-module.exports.run = (_client, message) => {
+module.exports.run = async (_client, message) => {
+    await message.guild.fetch()
+    console.log(message.member.presence);
     message.guild.members.fetch().then(AllMembers => {
+        console.log(AllMembers);
         const offline = AllMembers.filter(member => member.presence.status === "offline" && !member.user.bot)
         const idle = AllMembers.filter(member => member.presence.status === 'idle' && !member.user.bot)
         const dnd = AllMembers.filter(member => member.presence.status === 'dnd' && !member.user.bot)

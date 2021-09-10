@@ -16,7 +16,7 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
     let choix = ''
     let ChannelErrID
     const filterID = msg => msg.author.id === message.author.id && (msg.content.startsWith(`https://discord.com/channels/${message.guild.id}/`) || msg.content.toLowerCase() === 'cancel')
-    const filterReaction = reac => reac.users.cache.get(message.author.id) && !reac.me
+    const filterReaction = reac => reac.users.cache.get(message.author.id)
     const filter = mesg => mesg.author.id === message.author.id
     const filterChannel = ms => ms.mentions.channels.first()
 

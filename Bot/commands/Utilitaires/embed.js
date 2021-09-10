@@ -3,9 +3,8 @@
 const Discord = require('discord.js')
 const {MESSAGES} = require('../../starterpack/constants')
 
-module.exports.run = (client, message, args) => {
-    if (typeof args === 'array') args.join(' ')
-    const arg = args.split(';; ')
+module.exports.run = (_client, message, args) => {
+    const arg = args.join(' ').split(';; ')
     const embed = new Discord.MessageEmbed()
         .setColor(`${arg.shift()}`)
         .setTitle(`${arg.shift()}`)

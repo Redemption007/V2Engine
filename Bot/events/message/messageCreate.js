@@ -116,6 +116,14 @@ module.exports = async (client, message) => {
     tStamps.set(message.author.id, timeNow);
     setTimeout(() => tStamps.delete(message.author.id), cdAmount);
 
+    const Chan = message.channel
+    const _guild = message.guild
     await command.run(client, message, args, settings, dbUser);
-    setTimeout(() => message.delete().catch(), 5000)
+    setTimeout(() => message.delete().catch(async () => {
+        if (Chan.deleted) {
+            if (Chan.id === settings.generalChannel) await client.getGeneralChannel(_guild)
+        }
+        // eslint-disable-next-line no-useless-return
+        return
+    }), 5000)
 }
