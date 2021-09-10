@@ -21,7 +21,7 @@ module.exports.run = async (client, message) => {
     await message.channel.send({content: warning, embeds: [{color: 'PURPLE', description: 'Quel est le lien du message concerné ?'}]})
         .then(async msg1 => {
             try {
-                await message.channel.awaitMessages({filterID, max: 1, idle: 30000})
+                await message.channel.awaitMessages({filter: filterID, max: 1, idle: 30000})
                     .then(async collected1 => {
                         if (collected1.first().content.toLowerCase() === 'cancel') return msg1.edit('La commande a été annulée.')
                         const contenu1 = await collected1.first().content.slice(`https://discord.com/channels/${message.guild.id}/`.length).split('/')
@@ -33,14 +33,14 @@ module.exports.run = async (client, message) => {
                 await msg1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> L'id du message est : ${messageID}\n\
 > Le salon concerné est <#${channelID}>.\n> Le lien du message est <https://discord.com/channels/${message.guild.id}/${channelID}\
 /${messageID}>.`, fields: [{name: 'Prochaine étape :', value: 'Réagissez avec la réaction que vous souhaitez mettre :'}]}]})
-                await msg1.awaitReactions({filterReaction, max: 1, idle: 30000})
+                await msg1.awaitReactions({filter: filterReaction, max: 1, idle: 30000})
                     .then(async collected2 => {
                         Emoji = await collected2.first().emoji
                     })
                 await msg1.reactions.removeAll()
                 await msg1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> L'émoji avec lequel réagir est  ${Emoji}`,
                     fields: [{name: 'Prochaine étape :', value: 'Mentionnez le rôle concerné (@role) ?'}]}]})
-                await message.channel.awaitMessages({filterRole, max: 1, idle: 30000})
+                await message.channel.awaitMessages({filter: filterRole, max: 1, idle: 30000})
                     .then(async collected3 => {
                         if (collected3.first().content.toLowerCase() === 'cancel') return msg1.edit('La commande a été annulée.')
                         Role = await collected3.first().mentions.roles.first()
@@ -56,7 +56,7 @@ module.exports.run = async (client, message) => {
                 msg1.react('2️⃣')
                 msg1.react('3️⃣')
                 msg1.react('4️⃣')
-                await msg1.awaitReactions({filterReaction, max: 1, idle: 30000})
+                await msg1.awaitReactions({filter: filterReaction, max: 1, idle: 30000})
                     .then(collected4 => {
                         switch (collected4.first()._emoji.name) {
                         case '1️⃣':

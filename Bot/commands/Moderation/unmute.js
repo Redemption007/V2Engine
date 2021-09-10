@@ -13,12 +13,12 @@ module.exports.run = (client, message, args, settings) => {
     const member = message.mentions.members.first();
 
     if (!member.roles.cache.has(MuteRole.id)) {
-        return message.reply("l'utilisateur concerné n'est pas mute...");
+        return message.reply("L'utilisateur concerné n'est pas mute...");
     }
     member.roles.remove(MuteRole.id);
 
     const embed = new Discord.MessageEmbed()
-        .setTitle('Libéré, délivré(e)...')
+        .setTitle('Libéré•e, délivré•e...')
         .setColor('GREEN')
         .setDescription(`${member.toString()} peut à nouveau parler sur le serveur !`);
 

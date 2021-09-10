@@ -19,7 +19,7 @@ module.exports = async (client, tournoiid) => {
     const message = await InfosChannel.send(`Début du check-in ! <@&${tournoi.RoleTournoi}>`, {embed: {title: 'Réagissez pour confirmer', color: 'ORANGE', footer: {text: "L'équipe de modération du serveur se réserve le droit de vous refuser l'accès au tournoi à tout moment"}, description: `Si vous ne cochez pas la réaction ✅ ci-dessous, vous serez automatiquement disqualifié du tournoi.\n\n__**Fin du checkin à :**__ *${tournoi.Date.getHours()} heures et ${tournoi.Date.getMinutes()} minutes.*`}})
     await message.react('✅')
 
-    const checkinCollector = message.createReactionCollector({filterCheckin, time: 300000})
+    const checkinCollector = message.createReactionCollector({filter: filterCheckin, time: 300000})
     checkinCollector.on('collect', (reaction, user) => {
         try {
             let FOOTER

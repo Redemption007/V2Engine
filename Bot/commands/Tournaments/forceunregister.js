@@ -14,7 +14,7 @@ module.exports.run = async (client, message, _args, settings) => {
         .then(async msg => {
             msg.react('✅')
             msg.react('❌')
-            await msg.awaitReactions({filterReaction, max: 1, idle: 30000, errors: ['time']})
+            await msg.awaitReactions({filter: filterReaction, max: 1, idle: 30000, errors: ['time']})
                 .then(async coll => {
                     const emoji = await coll.first()._emoji.name
 

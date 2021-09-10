@@ -5,18 +5,19 @@ module.exports.run = async (client, message, args, settings) => {
 
     const member = message.mentions.members.first();
 
-    if (isNaN(args[1] || args[1]<1 || args[1]>100)) {
-        return message.reply(`Voici l'usage de la commande : \`purge <nombre_de_messages>\` avec le nombre compris entre 1 et 100.`);
+    if (isNaN(+args[1]) || +args[1]<1 || +args[1]>100) {
+        return message.reply(`Voici l'usage de la commande : \`prune <@user> <nombre_de_messages>\` avec le nombre compris entre 1 et 100.`);
     }
+    let messages
 
-    const messages = await message.channel.messages.fetch({
-        limit: Math.min(args[1], 100),
+    await message.channel.messages.fetch({
+        limit: Math.min(+args[1], 100),
         before: message.id,
-    }).filter(a => a.author.id === member.id).array()
+    }).then(coll => messages = coll.filter(a => a.author.id === member.id).map())
 
     messages.length = Math.min(args[1], messages.length)
     if (messages.length === 0) {
-        return message.reply("Il n'y pas de messages de cet utilisateur dans les 100 derniers messages.")
+        return message.reply("Il n'y pas de messages de cet utilisateur dans les 100 derniers messages.").then(m => setTimeout(() => m.delete(), 4000))
     } else if (messages.length === 1) {
         await messages[0].delete()
     } else {

@@ -28,7 +28,7 @@ module.exports.run = async (client, message) => {
     message.channel.send({embeds: [leaderboard]})
         .then(async lb => {
             const filter = reaction => reaction.users.cache.size>1 && (reaction.emoji.name === '◀️'||reaction.emoji.name === '⏹️'||reaction.emoji.name === '▶️')
-            const collector = await lb.createReactionCollector({filter, idle: 30000})
+            const collector = await lb.createReactionCollector({filter: filter, idle: 30000})
 
             if (Nbpages>1) await lb.react('◀️')
             await lb.react('⏹️')

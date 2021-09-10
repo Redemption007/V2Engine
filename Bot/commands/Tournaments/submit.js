@@ -12,7 +12,7 @@ module.exports.run = async (client, message, _args, settings) => {
     msg.react('✅')
     msg.react('🔄')
     msg.react('❌')
-    await msg.awaitReactions({filterReaction, max: 1, idle: 120000})
+    await msg.awaitReactions({filter: filterReaction, max: 1, idle: 120000})
         .then(async coll => {
             const emoji = coll.first()._emoji.name
 

@@ -8,7 +8,8 @@ module.exports.run = async (client, message, args, settings) => {
     const TimeMute = args[1]
     let raison = args.splice(2).join(' ') || 'Aucune raison spécifiée.';
 
-    if (!ms(TimeMute)) raison = args[1] + ' ' + raison || 'Aucune raison spécifiée.';
+    if (!ms(TimeMute)) raison = args[1] + ' ' + raison;
+    if (raison===' ') raison = 'Aucune raison spécifiée.';
 
     //CREATION DU ROLE MUTED S'IL N'EST PAS DEJA CRÉÉ :
 
@@ -16,6 +17,7 @@ module.exports.run = async (client, message, args, settings) => {
     let RoleMute = await message.guild.roles.fetch(settings.muteRole)
     if (!RoleMute) RoleMute = await message.guild.roles.cache.find(r => r.name === 'Muted');
 
+    if (RoleMute && member.roles.cache.get(RoleMute.id)) return message.reply('Cet utilisateur est déjà mute !')
     if (!RoleMute) {
         RoleMute = await message.guild.roles.create({
             data: {
@@ -38,20 +40,20 @@ module.exports.run = async (client, message, args, settings) => {
     //MUTE ENVOYÉ :
 
     if (!ms(TimeMute)) {
-        const embed = {embed: {title: 'La paix !', color: 'ORANGE', description: `<@${member.id}> a été rendu muet sur le serveur.`, fields: [{name: 'Raison :', value: raison}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}}
+        const embed = {embeds: [{title: 'La paix !', color: 'ORANGE', description: `<@${member.id}> a été rendu muet sur le serveur.`, fields: [{name: 'Raison :', value: raison}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}]}
 
-        const log = {embed: {title: 'MUTE', color: 'ORANGE', thumbnail: member.user.avatarURL(), description: `<@${member.id}> a été rendu muet sur le serveur.`, fields: [{name: 'Infos de l\'utilisateur', value: `Pseudo : ${member.user.tag}\nID : ${member.id}`}, {name: 'Action :', value: 'Mute'}, {name: 'Durée :', value: `Définitive`, inline: true}, {name: 'Raison :', value: `${raison}`, inline: true}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}}
+        const log = {embeds: [{title: 'MUTE', color: 'ORANGE', thumbnail: member.user.avatarURL(), description: `<@${member.id}> a été rendu muet sur le serveur.`, fields: [{name: 'Infos de l\'utilisateur', value: `Pseudo : ${member.user.tag}\nID : ${member.id}`}, {name: 'Action :', value: 'Mute'}, {name: 'Durée :', value: `Définitive`, inline: true}, {name: 'Raison :', value: `${raison}`, inline: true}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}]}
 
-        client.channels.fetch(settings.logChannel).send({embeds: [log]})
+        await client.channels.fetch(settings.logChannel).then(ch => ch.send(log))
 
-        return message.channel.send({embeds: [embed]});
+        return message.channel.send(embed);
     } else {
-        const embed = {embed: {title: 'La paix !', color: 'ORANGE', description: `<@${member.id}> a été rendu muet pour ${ms(ms(TimeMute), true)} sur le serveur.`, fields: [{name: 'Raison :', value: raison}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}}
+        const embed = {embeds: [{title: 'La paix !', color: 'ORANGE', description: `<@${member.id}> a été rendu muet pour ${ms(ms(TimeMute), true)} sur le serveur.`, fields: [{name: 'Raison :', value: raison}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}]}
 
-        const log = {embed: {title: 'TEMPMUTE', color: 'ORANGE', thumbnail: member.user.avatarURL(), description: `<@${member.id}> a été rendu muet sur le serveur.`, fields: [{name: 'Infos de l\'utilisateur', value: `Pseudo : ${member.user.tag}\nID : ${member.id}`, inline: false}, {name: 'Action :', value: 'Tempmute', inline: false}, {name: 'Durée :', value: `${ms(ms(TimeMute), true)}`, inline: true}, {name: 'Raison :', value: raison, inline: true}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}}
+        const log = {embeds: [{title: 'TEMPMUTE', color: 'ORANGE', thumbnail: member.user.avatarURL(), description: `<@${member.id}> a été rendu muet sur le serveur.`, fields: [{name: 'Infos de l\'utilisateur', value: `Pseudo : ${member.user.tag}\nID : ${member.id}`, inline: false}, {name: 'Action :', value: 'Tempmute', inline: false}, {name: 'Durée :', value: `${ms(ms(TimeMute), true)}`, inline: true}, {name: 'Raison :', value: raison, inline: true}], timestamp: Date.now(), footer: {text: `Mute effectué par ${message.author.username}.`, icon_url: message.author.avatarURL()}}]}
 
-        await client.channels.fetch(settings.logChannel).send({embeds: [log]})
-        await message.channel.send({embeds: [embed]});
+        await client.channels.fetch(settings.logChannel).send(log)
+        await message.channel.send(embed);
     }
 
     //UNMUTE PROGRAMMÉ :

@@ -15,11 +15,7 @@ module.exports.run = async (client, message, args, settings) => {
         const embed = new Discord.MessageEmbed()
             .setColor("BLUE")
             .setDescription(`${args[0]} messages ont été supprimés.`)
-        await message.channel.send({embeds: [embed]});
-
-        setTimeout(() => {
-            message.channel.lastMessage.delete()
-        }, 3000)
+        await message.channel.send({embeds: [embed]}).then(m => setTimeout(() => m.delete(), 3000))
         const log = new Discord.MessageEmbed()
             .setTitle("PURGE")
             .setColor("BLUE")

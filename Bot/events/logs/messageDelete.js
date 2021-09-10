@@ -39,7 +39,7 @@ module.exports = async (client, message) => {
         ensemble=[log]
         if (message.embeds.length) ensemble=[log].concat(message.embeds)
         return client.channels.cache.get(settings.logChannel).send({embeds: ensemble})
-    }
+    }/*
     message.content === ''? contenu = `***:warning: L${message.embeds.length>1?'es':"'"} intégration${message.embeds.length>1?'s':''} du message supprimé ${message.embeds.length>1?'sont':'est'} postée${message.embeds.length>1?'s':''} ci-après. :warning:***` : contenu = `:speech_balloon: ${message.content}`
 
     const log = new Discord.MessageEmbed()
@@ -54,5 +54,5 @@ module.exports = async (client, message) => {
         .setTimestamp();
     ensemble=[log]
     if (message.embeds.length) ensemble=[log].concat(message.embeds)
-    return client.channels.cache.get(settings.logChannel).send({embeds: ensemble})
+    return client.channels.fetch(settings.logChannel).then(m => m.send({embeds: ensemble}))*/
 }

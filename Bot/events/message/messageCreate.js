@@ -43,11 +43,12 @@ module.exports = async (client, message) => {
     } else {
         long = 23;
     }
-    const args = message.content.slice(long).split(' ');
+    const args = message.content.slice(long).split(' ').filter(i => i!=='');
     const commandName = args.shift().toLowerCase();
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.help.aliases && cmd.help.aliases.includes(commandName));
 
     if (!command) {
+        setTimeout(() => message.delete().catch(), 5000)
         return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: "La commande demandée est inexistante..."}]})
     }
 
@@ -57,7 +58,7 @@ module.exports = async (client, message) => {
         if (command.help.usage) {
             noArgsReply += `\nVoici comment utiliser la commande :\`${settings.prefix}${command.help.usage}\``
         }
-
+        setTimeout(() => message.delete().catch(), 5000)
         return message.channel.send(noArgsReply);
     }
 
@@ -68,24 +69,28 @@ module.exports = async (client, message) => {
                 .setColor("BLACK")
                 .setTimestamp()
                 .setDescription(`<@${message.author.id}>, tu n'as pas les permissions nécessaires pour éxécuter cette commande !`)
+            setTimeout(() => message.delete().catch(), 5000)
             return message.channel.send({embeds: [nope]});
         }
 
-        if (command.help.isUserModo && message.guild.member(message.mentions.users.first()).permissions.has('KICK_MEMBERS')) {
+        if (command.help.isUserModo && message.mentions.members.first().permissions.has('KICK_MEMBERS')) {
             const nope = new discord.MessageEmbed()
                 .setTitle("Hélaaa jeune chenapan !")
                 .setColor("BLACK")
                 .setTimestamp()
                 .setDescription(`<@${message.author.id}>, tu ne peux pas éxécuter la commande ${command.help.name} sur un modérateur !`);
+            setTimeout(() => message.delete().catch(), 5000)
             return message.channel.send({embeds: [nope]});
         }
 
     } catch (error) {
-        const nope = new discord.MessageEmbed().
-            setTitle("Houla !").
-            setColor("BLACK").
-            setTimestamp().
-            setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
+        if (message.mentions.users.first().id === client.user.id) return message.reply("Attends, t'as vraiment essayé de me troll là ?")
+        const nope = new discord.MessageEmbed()
+            .setTitle("Houla !")
+            .setColor("BLACK")
+            .setTimestamp()
+            .setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
+        setTimeout(() => message.delete().catch(), 5000)
         return message.channel.send({embeds: [nope]});
     }
 
@@ -104,7 +109,7 @@ module.exports = async (client, message) => {
             let plural = 'seconde'
 
             if (timeLeft.toFixed(0)>1) plural+='s';
-
+            setTimeout(() => message.delete().catch(), 5000)
             return message.reply(`Merci d'attendre ${timeLeft.toFixed(0)} ${plural} avant de ré-utiliser la commande \`${settings.prefix}${command.help.name}\`.`);
         }
     }

@@ -2,7 +2,7 @@ const {MESSAGES} = require('../../starterpack/constants')
 const Discord = require('discord.js');
 
 module.exports.run = async (client, message, args, settings) => {
-    const member = await message.mentions.member.first();
+    const member = await message.mentions.members.first();
     const raison = args.splice(1).join(' ') || 'Aucune raison spécifiée.';
     const embed = new Discord.MessageEmbed()
         .setTitle('Ouille !')
