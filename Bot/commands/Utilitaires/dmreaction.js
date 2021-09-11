@@ -29,13 +29,12 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                     .then(async collected1 => {
                         if (collected1.first().content.toLowerCase() === 'cancel') return message1.edit(`La commande a été annulée.`)
                         const contenu1 = await collected1.first().content.slice(`https://discord.com/channels/${message.guild.id}/`.length).split('/')
-
+                        
                         channelID = contenu1[0]
                         messageID = contenu1[1]
                         await collected1.first().delete()
                     })
-                await message1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> L'id du message est : ${messageID}\n> Le salon concerné est <#${channelID}>.\n\
-                    > Le lien du message est <https://discord.com/channels/${message.guild.id}/${channelID}/${messageID}>.`, fields: [{name: 'Prochaine étape :', value: 'Réagissez avec la réaction que vous souhaitez mettre :'}]}]})
+                await message1.edit({content: warning, embeds: [{color: 'PURPLE', description: `> L'id du message est : ${messageID}\n> Le salon concerné est <#${channelID}>.\n> Le lien du message est <https://discord.com/channels/${message.guild.id}/${channelID}/${messageID}>.`, fields: [{name: 'Prochaine étape :', value: 'Réagissez avec la réaction que vous souhaitez mettre :'}]}]})
                 await message1.awaitReactions({filter: filterReaction, max: 1, idle: 30000})
                     .then(collected2 => {
                         Emoji = collected2.first().emoji
@@ -49,11 +48,7 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                         await collected3.first().delete()
                     })
                 await message1.edit({content: warning, embeds: [{color: `PURPLE`, description: `> Le contenu envoyé par DM sera :\n:speech_balloon: ${contenuDM}`, fields: [
-                    {name: 'Prochaine étape :', value: 'Que\
- voulez-vous qu\'il se passe si l\'utilisateur a désactivé les DM sur le serveur ?\n\
-:one: Le contenu est envoyé avec mention sur un salon spécial.\n\
-:two: Une mention est envoyée sur ce salon spécial pour demander à l\'utilisateur d\'autoriser les DM sur le serveur.\n\
-:three: Rien ne se passe.'}
+                    {name: 'Prochaine étape :', value: "Que voulez-vous qu'il se passe si l'utilisateur a désactivé les DM sur le serveur ?\n:one: Le contenu est envoyé avec mention sur un salon spécial.\n:two: Une mention est envoyée sur ce salon spécial pour demander à l'utilisateur d'autoriser les DM sur le serveur.\n:three: Rien ne se passe."}
                 ]}]})
                 message1.react('1️⃣')
                 message1.react('2️⃣')
@@ -115,7 +110,7 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                 }
                 await client.createReactor({
                     guildID: message.guild.id,
-                    guildName: message.guild.name,
+                    channelID: channelID,
                     msgReactorID: messageDMR.id,
                     typeReactor: ['DM'],
                     typeAction: [dmr],

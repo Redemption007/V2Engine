@@ -1,7 +1,9 @@
 const Discord = require('discord.js')
-const Reactor = require('../../modeles/reactor')
+// const Reactor = require('../../modeles/reactor')
 
 module.exports = async (client, channel) => {
+    if (channel.type === 'DM') return;
+    const settings = await client.getGuild(channel.guild)
     const FetchGuildAuditLogs = await channel.guild.fetchAuditLogs({
         limit: 1,
         type: 'CHANNEL_DELETE'
@@ -19,24 +21,24 @@ module.exports = async (client, channel) => {
         .setDescription(`Par <@${executor.id}>`, executor.displayAvatarURL())
         .addField('__Nom du salon :__', `${channel.name}`)
         .addField('__Catégorie :__', `${channel.parent || 'Sans catégorie'}`)
-        .addField('__Détails :__', `*Sujet :* ${target.topic}\n*Spécification :* ${nsfw}\n*Raison :* ${reason || 'Pas de raison précisée'}`)
-        .setFooter(`Type de salon : ${channel.type}`)
+        .addField('__Détails :__', `*Raison :* ${reason || 'Pas de raison précisée'}\n*Spécification :* ${nsfw}\n*Sujet :* ${target.topic}`)
+        .setFooter(`Type de salon : ${client.typeOfChannel(channel)}`)
         .setTimestamp();
 
-    client.channels.cache.get(client.config.CHANNELLOGID).send({embeds: [log]})
-
-    const reactors = await Reactor.find(r => r && channel.id === r.channelID)
-    if (reactors.length) {
-        for (let i=0; i<reactors.length; i++) {
-            reactors[i].delete()
+    client.channels.cache.get(settings.logChannel).send({embeds: [log]})
+    /*
+    const reactors = await client.getReactors(channel)
+    if (reactors) {
+        for (let i=0; i<reactors.size; i++) {
+            await reactors[i].delete()
         }
     }
-    const senders = await Reactor.find(re => re && re.channelsending.includes(channel.id))
-    if (senders.length) {
+    const senders = await client.getSenders(channel)
+    if (senders.size) {
         console.log('Modification de l\'envoi d\'informations des réacteurs');
-        for (let j=0; j<senders.length; j++) {
+        for (let j=0; j<senders.size; j++) {
             const index = await senders[j].channelsending.indexOf(channel.id)
-            if (senders[j].channelsending.length>1) senders[j].channelsending.slice(index, 1)
+            if (senders[j].channelsending.size>1) senders[j].channelsending.slice(index, 1)
             //Sinon on redirige le message vers le salon général, et on prévient les admins
             else {
                 const settings = await client.getGuild({guildID: channel.guild.id})
@@ -45,5 +47,5 @@ module.exports = async (client, channel) => {
             }
             await senders[j].save()
         }
-    }
+    }*/
 }

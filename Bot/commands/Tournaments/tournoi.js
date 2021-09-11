@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 const {MESSAGES} = require('../../starterpack/constants')
-const ms = require('../../../../ms')
+const ms = require('../../util/ms')
 
 module.exports.run = async (client, message, _args, settings) => {
 
@@ -41,10 +41,7 @@ module.exports.run = async (client, message, _args, settings) => {
     let msg
 
     await message.channel.send({content: warning, embeds: [{color: 'DARK_GREEN', title: 'La commande a été validée !', description: 'Quel sera le nom du tournoi ?'}]})
-        .then(mesg => msg = mesg)
-        .catch(() => {
-            return message.reply('Le bot a rencontré une erreur d\'API. Merci de réessayer.')
-        })
+        .then(mesg => msg = mesg).catch(() => { return message.reply('Le bot a rencontré une erreur d\'API. Merci de réessayer.') })
     try {
         await message.channel.awaitMessages({filter: filterMsg, max: 1, idle: 30000, errors: 'time'})
             .then(async coll => {
@@ -197,166 +194,170 @@ module.exports.run = async (client, message, _args, settings) => {
         await msg.edit({content: warning, embeds: [{color: 'GREEN', title: '', description: `Voici un récapitulatif du tournoi :\n__**Nom :**__ ${nomdutournoi} ;\n\n__**Prix :**__ ${CP}\n\n__**Date :**__ Le ${date.toLocaleTimeString('fr-FR', options)}\n\n__**Durée :**__ ${ms(duration, true)}\n\n__**Déroulement :**__\n:speech_balloon: ${deroulement}\n\n__**Début des inscriptions :**__ Le ${datedebutinsc.toLocaleTimeString('fr-FR', options)}\n\n__**Fin des inscriptions :**__ ${ms(fin, true)} avant le début du tournoi.\n\n__**Nombre maximal d'équipes inscrites :**__ ${nbteam}\n\n__**Nombre de joueur(s) par équipe :**__ ${compo}\n${complet}\n\n__**Lobbys :**__ ${room} équipes par lobby\n\n__**Staff :**__ <@&${staffid}>`, footer: {text: 'Réagissez avec ✅ pour valider, avec ❌ pour annuler'}}]})
         await msg.react('✅')
         await msg.react('❌')
-        await msg.awaitReactions({filter: filterReaction, max: 1, idle: 60000, errors: 'time'})
-            .then(async coll => {
-                const emoji = await coll.first()._emoji.name
+        const coll = await msg.awaitReactions({filter: filterReaction, max: 1, idle: 60000})
+        const emoji = await coll.first()._emoji.name
 
-                switch (emoji) {
-                case '✅':
-                    await message.channel.send({embeds: [{color: "GREEN", title: 'La commande a été validée !', description: "Création de la catégorie du Tournoi..."}]})
-                        .then(mesg => validation = mesg)
-                    positions = await message.guild.channels.cache.filter(chann => chann.type === 'category')
+        switch (emoji) {
+        case '✅':
+            await message.channel.send({embeds: [{color: "GREEN", title: 'La commande a été validée !', description: "Création de la catégorie du Tournoi..."}]})
+                .then(mesg => validation = mesg)
+            positions = await message.guild.channels.cache.filter(chann => chann.type === 'category')
 
-                    await message.guild.channels.create(`Tournoi du ${date.getDate()}/${date.getMonth()}`, {
-                        permissionOverwrites: [
-                            {
-                                id: message.guild.roles.everyone,
-                                allow: ['VIEW_CHANNEL', 'READ_MESSAGE_HISTORY']
-                            }
-                        ],
-                        type: 'category',
-                        position: positions.size
-                    })
-                        .then(channel => parentid = channel.id)
-                    await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du channel d\'informations...'}]})
-                    await message.guild.channels.create('infos-tournoi', {
-                        type: 'text',
-                        parent: parentid,
-                        permissionOverwrites: [
-                            {
-                                id: message.guild.roles.everyone,
-                                allow: ['READ_MESSAGE_HISTORY', 'VIEW_CHANNEL'],
-                                deny: ['ADD_REACTIONS', 'SEND_MESSAGES', 'MANAGE_MESSAGES'],
-                                type: 'role',
-                            }
-                        ],
-                        position: 1
-                    })
-                        .then(ch => InfosChannel = ch)
-                    await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du channel d\'inscriptions...'}]})
-                    await message.guild.channels.create('inscriptions-tournoi', {
-                        type: 'text',
-                        parent: parentid,
-                        permissionOverwrites: [
-                            {
-                                id: message.guild.roles.everyone,
-                                allow: ['READ_MESSAGE_HISTORY', 'SEND_MESSAGES', 'VIEW_CHANNEL'],
-                                deny: ['ADD_REACTIONS', 'MANAGE_MESSAGES'],
-                                type: 'role'
-                            }
-                        ],
-                        position: 2
-                    })
-                        .then(ch => InscriptionsChannel = ch)
-                    await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du channel du staff...'}]})
-                    await message.guild.channels.create('staff-tournoi', {
-                        type: 'text',
-                        parent: parentid,
-                        permissionOverwrites: [
-                            {
-                                id: staffid,
-                                allow: ['READ_MESSAGE_HISTORY', 'SEND_MESSAGES', 'VIEW_CHANNEL', 'ADD_REACTIONS', 'MANAGE_MESSAGES'],
-                                type: 'role'
-                            },
-                            {
-                                id: message.guild.roles.everyone,
-                                deny: ['VIEW_CHANNEL'],
-                                type: 'role'
-                            }
-                        ],
-                        position: 3
-                    })
-                        .then(ch => StaffChannel = ch)
-                    await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: "- `forceunregister` : obliger un membre à quitter un tournoi,\n- `list` : obtenir la liste des inscrits,\n- `check` : vérification des résultats,\n- `bantournoi` : bannissement d'un membre aux tournois,\n- `unbantournoi` : révocation du bannissement d'un membre aux tournois,\n- `deletetournoi` : suppression du tournoi."}]})
-                    await StaffChannel.send({embeds: [{color: "DARK_GREEN", title: 'Voici la liste des commandes à connaître :', description: "Création de la catégorie du Tournoi..."}]})
-                        .then(mesg => mesg.pin())
-                    await InfosChannel.send({content: `@everyone`, embeds: [{
-                        title: `Tournoi "${nomdutournoi}"`,
-                        color: 'AQUA',
-                        timestamp: Date.now(),
-                        fields: [
-                            {
-                                name: '__Prix :__',
-                                value: `${CP}`
-                            },
-                            {
-                                name: '__Date :__',
-                                value: `Le ${date.toLocaleTimeString('fr-FR', options)}`
-                            },
-                            {
-                                name: '__Durée :__',
-                                value: ms(duration),
-                                inline: true
-                            },
-                            {
-                                name: '__Déroulement du tournoi :__',
-                                value: deroulement
-                            },
-                            {
-                                name: '__Début des inscriptions :__',
-                                value: `Le ${datedebutinsc.toLocaleTimeString('fr-FR', options)}`
-                            },
-                            {
-                                name: '__Fin :__',
-                                value: `${ms(fin, true)} avant le début du tournoi`,
-                                inline: true
-                            },
-                            {
-                                name: '__Nombre maximal d\'équipes incrites :__',
-                                value: `${nbteam} équipes (${room} équipes par lobby)`
-                            },
-                            {
-                                name: '__Composition des équipes :__',
-                                value: `${composition}${complet}`,
-                                inline: true
-                            }
-                        ]
-                    }]}).then(m => { m.pin().then(mm => { mm.channel.messages.cache.forEach(e => { if(e.system) e.delete() }) }) })
-                    await InscriptionsChannel.send({embeds: [{color: "DARK_AQUA", title: `Voici le channel d'inscriptions du Tournoi ${nomdutournoi} !`, description: `Voir les infos : <#${InfosChannel.id}>\n\nFaites \`${settings.prefix}register\` pour vous inscrire.\n Faites \`${settings.prefix}unregister\` pour vous désinscrire.\nFaites \`${settings.prefix}timer\` pour connaître le temps restant avant le début du tournoi.\nFaites \`${settings.prefix}infos\` pour connaître les informations du tournoi en temps réel.`}]})
-                        .then(mesg => mesg.pin())
-                    await InfosChannel.setTopic(`Inscriptions ici : <#${InscriptionsChannel.id}>\n Commande : 📥 ***${settings.prefix}register***`)
-                    await InscriptionsChannel.setTopic(`Informations disponibles ici : <#${InfosChannel.id}>`)
-                    await StaffChannel.setTopic(`Salon d'informations : <#${InfosChannel.id}>\nSalon d'inscriptions : <#${InscriptionsChannel.id}>\n\n__Liste des commandes à connaître :__\n\n📤 *${settings.prefix}forceunregister* : obliger un membre à quitter un tournoi,\n📜 *${settings.prefix}list* : obtenir la liste des inscrits,\n📯 *${settings.prefix}check* : vérification des résultats,\n🔒 *${settings.prefix}bantournoi* : bannissement d'un membre aux tournois,\n🔓 *${settings.prefix}unbantournoi* : révocation du bannissement,\n🗑️ *${settings.prefix}deletetournoi* : suppression du tournoi.`)
-                    await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du tournoi...'}]})
-                    await message.guild.roles.create({data: {
-                        name: `Tournoi ${nomdutournoi}`,
-                        color: 'DARK_AQUA',
-                        mentionnable: false
-                    }})
-                        .then(role => roleTournoi = role.id)
-                    const tournoi = {
-                        guildID: message.guild.id,
-                        InscriptionsChannelID: InscriptionsChannel.id,
-                        StaffChannelID: StaffChannel.id,
-                        NomduTournoi: nomdutournoi,
-                        Date: date,
-                        Duree: duration,
-                        InscriptionsDate: datedebutinsc,
-                        InscriptionsFin: fin,
-                        NbdeTeams: nbteam,
-                        Lobbys: room,
-                        Gagnants: winners,
-                        Compo: compo,
-                        Random: random,
-                        Incomplets: incomplets,
-                        RoleTournoi: roleTournoi,
-                        Inscrits: []
+            await message.guild.channels.create(`Tournoi du ${date.getDate()<10?`0${date.getDate()}`:date.getDate()}/${date.getMonth()<10?`0${date.getMonth()}`:date.getMonth()}`, {
+                permissionOverwrites: [
+                    {
+                        id: message.guild.roles.everyone,
+                        allow: ['VIEW_CHANNEL', 'READ_MESSAGE_HISTORY']
                     }
-
-                    const inscriptionstime = tournoi.InscriptionsDate.valueOf()-Date.now()
-
-                    await validation.edit({embeds: [{color: 'GREEN', title: "Tournoi créé avec succès !"}]})
-                    await client.createTournoi(tournoi)
-                        .then(tn => client.clock((tnid, setings) => {
-                            client.emit('begintournoi', tnid, setings)
-                        }, inscriptionstime, tn._id, settings))
-                    break
-                default:
-                    return msg.edit(`<@${message.author.id}>, la commande a été annulée avec succès.`)
-                }
+                ],
+                type: 'GUILD_CATEGORY',
+                position: positions.size
             })
-    } catch (e) {
-        return message.reply(canceled)
-    }
+                .then(channel => parentid = channel.id)
+            await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du channel d\'informations...'}]})
+            await message.guild.channels.create('infos-tournoi', {
+                type: 'GUILD_TEXT',
+                parent: parentid,
+                permissionOverwrites: [
+                    {
+                        id: message.guild.roles.everyone,
+                        allow: ['READ_MESSAGE_HISTORY', 'VIEW_CHANNEL'],
+                        deny: ['ADD_REACTIONS', 'SEND_MESSAGES', 'MANAGE_MESSAGES'],
+                        type: 'role',
+                    }
+                ],
+                position: 1
+            })
+                .then(ch => InfosChannel = ch)
+            await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du channel d\'inscriptions...'}]})
+            await message.guild.channels.create('inscriptions-tournoi', {
+                type: 'GUILD_TEXT',
+                parent: parentid,
+                permissionOverwrites: [
+                    {
+                        id: message.guild.roles.everyone,
+                        allow: ['READ_MESSAGE_HISTORY', 'SEND_MESSAGES', 'VIEW_CHANNEL'],
+                        deny: ['ADD_REACTIONS', 'MANAGE_MESSAGES'],
+                        type: 'role'
+                    }
+                ],
+                position: 2
+            })
+                .then(ch => InscriptionsChannel = ch)
+            await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du channel du staff...'}]})
+            await message.guild.channels.create('staff-tournoi', {
+                type: 'GUILD_TEXT',
+                parent: parentid,
+                permissionOverwrites: [
+                    {
+                        id: staffid,
+                        allow: ['READ_MESSAGE_HISTORY', 'SEND_MESSAGES', 'VIEW_CHANNEL', 'ADD_REACTIONS', 'MANAGE_MESSAGES'],
+                        type: 'role'
+                    },
+                    {
+                        id: message.guild.roles.everyone,
+                        deny: ['VIEW_CHANNEL'],
+                        type: 'role'
+                    }
+                ],
+                position: 3
+            })
+                .then(ch => StaffChannel = ch)
+
+            await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: "Envoi des informations dans le salon d'inscription..."}]})
+            await InscriptionsChannel.send({embeds: [{color: "DARK_AQUA", title: `Voici le channel d'inscriptions du Tournoi ${nomdutournoi} !`, description: `Voir les infos : <#${InfosChannel.id}>\n\nFaites \`${settings.prefix}register\` pour vous inscrire.\n Faites \`${settings.prefix}unregister\` pour vous désinscrire.\nFaites \`${settings.prefix}timer\` pour connaître le temps restant avant le début du tournoi.\nFaites \`${settings.prefix}infos\` pour connaître les informations du tournoi en temps réel.`}]}).then(mesg => mesg.pin())
+            await InscriptionsChannel.setTopic(`Informations disponibles ici : <#${InfosChannel.id}>`)
+
+            await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: "Envoi des informations dans le salon du staff..."}]})
+            await StaffChannel.setTopic(`Salon d'informations : <#${InfosChannel.id}>\nSalon d'inscriptions : <#${InscriptionsChannel.id}>\n\n__Liste des commandes à connaître :__\n\n📤 *forceunregister* : obliger un membre à quitter un tournoi,\n📜 *list* : obtenir la liste des inscrits,\n📯 *check* : vérification des résultats,\n🔒 *bantournoi* : bannissement d'un membre aux tournois,\n🔓 *unbantournoi* : révocation du bannissement,\n🗑️ *deletetournoi* : suppression du tournoi.`)
+            await StaffChannel.send({embeds: [{color: "DARK_GREEN", title: 'Voici la liste des commandes à connaître :', description:  "- `forceunregister` : obliger un membre à quitter un tournoi,\n- `list` : obtenir la liste des inscrits,\n- `check` : vérification des résultats,\n- `bantournoi` : bannissement d'un membre aux tournois,\n- `unbantournoi` : révocation du bannissement d'un membre aux tournois,\n- `deletetournoi` : suppression du tournoi."}]})
+                .then(mesg => mesg.pin())
+
+            await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: "Envoi des informations dans le salon d'informations..."}]})
+            await InfosChannel.setTopic(`Inscriptions ici : <#${InscriptionsChannel.id}>\n Commande : 📥 ***${settings.prefix}register***`)
+            await InfosChannel.send({content: `@everyone`, embeds: [{
+                title: `Tournoi "${nomdutournoi}"`,
+                color: 'AQUA',
+                timestamp: Date.now(),
+                fields: [
+                    {
+                        name: '__Prix :__',
+                        value: `${CP}`
+                    },
+                    {
+                        name: '__Date :__',
+                        value: `Le ${date.toLocaleTimeString('fr-FR', options)}`
+                    },
+                    {
+                        name: '__Durée :__',
+                        value: ms(duration),
+                        inline: true
+                    },
+                    {
+                        name: '__Déroulement du tournoi :__',
+                        value: deroulement
+                    },
+                    {
+                        name: '__Début des inscriptions :__',
+                        value: `Le ${datedebutinsc.toLocaleTimeString('fr-FR', options)}`
+                    },
+                    {
+                        name: '__Fin :__',
+                        value: `${ms(fin, true)} avant le début du tournoi`,
+                        inline: true
+                    },
+                    {
+                        name: '__Nombre maximal d\'équipes incrites :__',
+                        value: `${nbteam} équipes (${room} équipes par lobby)`
+                    },
+                    {
+                        name: '__Composition des équipes :__',
+                        value: `${composition}${complet}`,
+                        inline: true
+                    }
+                ]
+            }]}).then(m => { m.pin().then(mm => { mm.channel.messages.cache.forEach(e => { if(e.system) e.delete() }) }) })
+
+            await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du tournoi...'}]})
+            await message.guild.roles.create({data: {
+                name: `Tournoi ${nomdutournoi}`,
+                color: 'DARK_AQUA',
+                mentionnable: false
+            }})
+                .then(role => roleTournoi = role.id)
+            const tournoi = {
+                guildID: message.guild.id,
+                InscriptionsChannelID: InscriptionsChannel.id,
+                StaffChannelID: StaffChannel.id,
+                NomduTournoi: nomdutournoi,
+                Date: date,
+                Duree: duration,
+                InscriptionsDate: datedebutinsc,
+                InscriptionsFin: fin,
+                NbdeTeams: nbteam,
+                Lobbys: room,
+                Gagnants: winners,
+                Compo: compo,
+                Random: random,
+                Incomplets: incomplets,
+                RoleTournoi: roleTournoi,
+                Inscrits: []
+            }
+
+            const inscriptionstime = tournoi.InscriptionsDate.valueOf()-Date.now()
+
+            await validation.edit({embeds: [{color: 'GREEN', title: "Tournoi créé avec succès !"}]})
+            await client.createTournoi(tournoi)
+                .then(tn => client.clock((tnid, setings) => {
+                    client.emit('begintournoi', tnid, setings)
+                }, inscriptionstime, tn._id, settings))
+            break
+        default:
+            return msg.edit(`<@${message.author.id}>, la commande a été annulée avec succès.`)
+        }
+    /*} catch (e) {
+        return message.reply(canceled)*/
+    // eslint-disable-next-line no-unsafe-finally
+    } finally { return }
 }
 module.exports.help = MESSAGES.Commandes.Tournaments.TOURNOI;

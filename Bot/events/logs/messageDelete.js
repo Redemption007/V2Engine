@@ -1,14 +1,9 @@
 const Discord = require('discord.js')
-const Reactor = require('../../modeles/reactor')
 
 module.exports = async (client, message) => {
     const settings = await client.getGuild(message.guild)
-
-    const reactors = await Reactor.find(r => {
-        if (!r) return false
-        return message.id === r.msgReactorID
-    })
-    if (reactors.length) reactors[0].delete()
+    const reactor = client.getReactor({id: message.id})
+    if (reactor) await client.deleteReactor(message.id, 'all')
     if (message.partial) return
 
     const FetchGuildAuditLogs = await message.guild.fetchAuditLogs({

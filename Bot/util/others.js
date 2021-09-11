@@ -28,6 +28,35 @@ module.exports = client => {
         }
     }
 
+    client.typeOfChannel = channel => {
+        switch (channel.type){
+        case 'GUILD_TEXT':
+            return 'Salon textuel'
+        case 'DM':
+            return 'DM'
+        case 'GUILD_VOICE':
+            return 'Salon Vocal'
+        case 'GROUP_DM':
+            return 'DM de groupe'
+        case 'GUILD_CATEGORY':
+            return 'Catégorie'
+        case 'GUILD_NEWS':
+            return 'Salons de nouveautés'
+        case 'GUILD_STORE':
+            return 'Salon Commercial'
+        case 'GUILD_NEWS_THREAD':
+            return 'Thread de nouveautés'
+        case 'GUILD_PUBLIC_THREAD':
+            return 'Thread public'
+        case 'GUILD_PRIVATE_THREAD':
+            return 'Thread privé'
+        case 'GUILD_STAGE_VOICE':
+            return 'Salon de stage'
+        case 'UNKNOWN':
+            return 'Inconnu'
+        }
+    }
+
     client.reTry = f => f().catch(() => setTimeout(() => client.reTry(f), 3000))         //Pour régler la ParallelSave Error de MongoDB. En espérant que ça marche !
 
     //Durée maximale : 1 an, 32 jours 7 heures, 55 minutes et 12 secondes

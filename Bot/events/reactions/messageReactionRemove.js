@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-return */
 module.exports = async (client, MessageReaction, user) => {
-    if (MessageReaction.message.channel.type === 'dm') return
+    if (user.bot || MessageReaction.message.channel.type === 'DM') return
     const message = MessageReaction.message
     const emojiName = MessageReaction.emoji.name
     const messageReactor = await client.getReactor(message)

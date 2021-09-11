@@ -3,15 +3,27 @@ const Reactor = require('../modeles/reactor');
 
 module.exports = client => {
 
-    client.createReactor = reactor => {
-        const merged = Object.assign({_id: mongoose.Types.ObjectId()}, reactor)
+    client.createReactor = async reactor => {
+        const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, reactor)
         const createReactor = new Reactor(merged)
 
-        createReactor.save()
+        await createReactor.save(function (err) { if (err) console.error(); })
     }
 
     client.getReactor = async msg => {
-        const data = await Reactor.findOne({msgReactorID: msg.id});
+        const data = await Reactor.findOne({msgReactorID: msg.id})
+
+        if (data) return data;
+    }
+
+    client.getReactors = async channel => {
+        const data = await Reactor.find({channelID: channel.id});
+
+        if (data) return data;
+    }
+
+    client.getSenders = async channel => {
+        const data = await Reactor.find(re => re.channelsending.includes(channel.id));
 
         if (data) return data;
     }
@@ -21,13 +33,10 @@ module.exports = client => {
 
         if (typeof data !== "object") return data = {};
 
-        await data.typeReactor.push(settings.typeReactor)
-        await data.typeAction.push(settings.typeAction)
-        await data.emojis.push(settings.emojis)
-        await data.channelsending.push(settings.channelsending)
-        await data.autre.push(settings.autre)
-
-        return data.save()
+        for (const key in settings) {
+            await data[key].push(settings[key])
+        }
+        return data.save(function (err) { if (err) console.error(); })
     }
 
     client.deleteReactor = async (msg, emojiName) => {
@@ -48,6 +57,6 @@ module.exports = client => {
             return Reactor.deleteOne({msgReactorID: reactorToDelete.msgReactorID})
         }
 
-        return reactorToDelete.save()
+        return reactorToDelete.save(function (err) { if (err) console.error(); })
     }
 }

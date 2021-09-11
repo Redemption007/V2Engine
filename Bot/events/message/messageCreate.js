@@ -4,7 +4,7 @@ let long = 0;
 module.exports = async (client, message) => {
 
     if (message.author.bot) return;
-    if (message.channel.type === 'dm') return client.emit('DM', message);
+    if (message.channel.type === 'DM') return client.emit('DM', message);
     const settings = await client.getGuild(message.guild)
     let dbUser = await client.getUser(message.member)
 
@@ -123,7 +123,5 @@ module.exports = async (client, message) => {
         if (Chan.deleted) {
             if (Chan.id === settings.generalChannel) await client.getGeneralChannel(_guild)
         }
-        // eslint-disable-next-line no-useless-return
-        return
-    }), 5000)
+    }), 2000)
 }

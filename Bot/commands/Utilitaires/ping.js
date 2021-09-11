@@ -1,5 +1,5 @@
 const {MESSAGES} = require('../../starterpack/constants')
-const ms = require('../../../../ms')
+const ms = require('../../util/ms')
 
 module.exports.run = async (client, message) => {
     const filterReaction = async r => {

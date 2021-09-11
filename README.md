@@ -5,6 +5,12 @@ There's a lot to experience, and we hope you'll enjoy it !
 Now the project is downloaded, you juste have to do a few changes to make it functionnal.
 - You have to rename this file in '.env'.
 - Mind to the text between [] and change the given informations with yours.
+- You'll need to have a project on MongoDB Database to make the bot working.
+- This project works with NPM
+- These are the modules to install :
+    • discord.js@v13.1.0
+    • mongoose@v6.0.5
+    • dotenv@v10.0.0
 
 If there's any issue, please open a new issue here : https://github.com/Redemption007/V2Engine/issues/new
 Thank you for your participation.

@@ -1,4 +1,4 @@
-const ms = require('../../../../ms')
+const ms = require('../../util/ms')
 
 module.exports = async (client, tournoiid) => {
     const tournoi = await client.getTournoi({_id: tournoiid})

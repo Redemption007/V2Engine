@@ -4,10 +4,10 @@ const Voice = require('../modeles/voice')
 module.exports = client => {
 
     client.createVoice = async voice => {
-        const merged = Object.assign({_id: mongoose.Types.ObjectId()}, voice);
+        const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, voice);
         const createVoice = await new Voice(merged);
 
-        createVoice.save()
+        createVoice.save(function (err) { if (err) console.error(); })
     }
 
     client.getVoice = async voice => {

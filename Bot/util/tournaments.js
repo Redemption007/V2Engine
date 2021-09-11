@@ -4,10 +4,10 @@ const Tournoi = require('../modeles/tournoi');
 module.exports = client => {
 
     client.createTournoi = async tournoi => {
-        const merged = Object.assign({_id: mongoose.Types.ObjectId()}, tournoi)
+        const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, tournoi)
         const createTournoi = await new Tournoi(merged)
 
-        return createTournoi.save()
+        return createTournoi.save(function (err) { if (err) console.error(); })
     }
 
     client.getTournoi = async object => {
@@ -20,7 +20,7 @@ module.exports = client => {
         if (tournoi.Compo === 1 || tournoi.Random) {
             await tournoi.Inscrits.push({members: [one]})
 
-            return tournoi.save()
+            return tournoi.save(function (err) { if (err) console.error(); })
         }
         const guild = await client.guilds.fetch(tournoi.guildID)
         const newcomer = await guild.members.fetch(one.userid)
@@ -34,12 +34,12 @@ module.exports = client => {
                 })
                 team.members.push({userid: one.id, pseudo: one.pseudo})
 
-                return tournoi.save()
+                return tournoi.save(function (err) { if (err) console.error(); })
             }
         })
         await tournoi.Inscrits.push({id: one.teamid, members: [{userid: one.id, pseudo: one.pseudo}]})
 
-        return tournoi.save()
+        return tournoi.save(function (err) { if (err) console.error(); })
     }
 
     client.askTeam = async (tournoi, one) => {
@@ -79,7 +79,7 @@ module.exports = client => {
         await tournoi.Inscrits[i].members.splice(j, 1)
         if (tournoi.Inscrits[i].members.length === 0) await tournoi.Inscrits.splice(i, 1)
 
-        return tournoi.save()
+        return tournoi.save(function (err) { if (err) console.error(); })
     }
 
     client.updateInscrits = async (tournoi, memberlist) => {
@@ -123,7 +123,7 @@ module.exports = client => {
             }
         }
         tournoi.Inscrits = await newlist
-        await tournoi.save()
+        await tournoi.save(function (err) { if (err) console.error(); })
 
         return tournoi.Inscrits
     }
@@ -179,7 +179,7 @@ module.exports = client => {
             }
         }
         tournoi.Inscrits = newlist
-        await tournoi.save()
+        await tournoi.save(function (err) { if (err) console.error(); })
 
         return tournoi.Inscrits
     }
@@ -190,7 +190,7 @@ module.exports = client => {
                 await tournoi.NextRound.push(team[i].members[0])
             } else { await team[i].members.forEach(t => tournoi.NextRound.push(t)) }
         }
-        await tournoi.save()
+        await tournoi.save(function (err) { if (err) console.error(); })
 
         return tournoi.NextRound
     }
