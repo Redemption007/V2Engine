@@ -61,7 +61,7 @@ module.exports = client => {
 
     //Durée maximale : 1 an, 32 jours 7 heures, 55 minutes et 12 secondes
     client.clock = (f, Time, _1, _2, _3, _4) => {
-        if (isNaN(Time)) return
+        if (isNaN(Time)) throw new Error('ClockError: (at client.clock) Time is not a number: please enter an integer')
         setTimeout(() => {
             setTimeout(() => {
                 setTimeout(() => {

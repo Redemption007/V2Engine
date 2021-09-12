@@ -97,7 +97,7 @@ module.exports.run = async (client, message, _args, settings) => {
                 if (debutinsc === 'cancel') throw new Error(canceled)
                 debutinsc = debutinsc.replace(/le|à|a|h|:| +|\//ig, ' ').trim().split(' ')
                 datedebutinsc.setFullYear(mtn.getFullYear());
-                datedebutinsc.setMonth(+debutinsc[1]);
+                datedebutinsc.setMonth(+debutinsc[1]-1);
                 datedebutinsc.setDate(+debutinsc[0]);
                 coll.first().delete()
             })
@@ -191,7 +191,7 @@ module.exports.run = async (client, message, _args, settings) => {
                 })
             await msg.reactions.removeAll()
         }
-        await msg.edit({content: warning, embeds: [{color: 'GREEN', title: '', description: `Voici un récapitulatif du tournoi :\n__**Nom :**__ ${nomdutournoi} ;\n\n__**Prix :**__ ${CP}\n\n__**Date :**__ Le ${date.toLocaleTimeString('fr-FR', options)}\n\n__**Durée :**__ ${ms(duration, true)}\n\n__**Déroulement :**__\n:speech_balloon: ${deroulement}\n\n__**Début des inscriptions :**__ Le ${datedebutinsc.toLocaleTimeString('fr-FR', options)}\n\n__**Fin des inscriptions :**__ ${ms(fin, true)} avant le début du tournoi.\n\n__**Nombre maximal d'équipes inscrites :**__ ${nbteam}\n\n__**Nombre de joueur(s) par équipe :**__ ${compo}\n${complet}\n\n__**Lobbys :**__ ${room} équipes par lobby\n\n__**Staff :**__ <@&${staffid}>`, footer: {text: 'Réagissez avec ✅ pour valider, avec ❌ pour annuler'}}]})
+        await msg.edit({embeds: [{color: 'GREEN', title: '', description: `Voici un récapitulatif du tournoi :\n__**Nom :**__ ${nomdutournoi} ;\n\n__**Prix :**__ ${CP}\n\n__**Date :**__ Le ${date.toLocaleTimeString('fr-FR', options)}\n\n__**Durée :**__ ${ms(duration, true)}\n\n__**Déroulement :**__\n:speech_balloon: ${deroulement}\n\n__**Début des inscriptions :**__ Le ${datedebutinsc.toLocaleTimeString('fr-FR', options)}\n\n__**Fin des inscriptions :**__ ${ms(fin, true)} avant le début du tournoi.\n\n__**Nombre maximal d'équipes inscrites :**__ ${nbteam}\n\n__**Nombre de joueur(s) par équipe :**__ ${compo}\n${complet}\n\n__**Lobbys :**__ ${room} équipes par lobby\n\n__**Staff :**__ <@&${staffid}>`, footer: {text: 'Réagissez avec ✅ pour valider, avec ❌ pour annuler'}}]})
         await msg.react('✅')
         await msg.react('❌')
         const coll = await msg.awaitReactions({filter: filterReaction, max: 1, idle: 60000})
@@ -319,12 +319,12 @@ module.exports.run = async (client, message, _args, settings) => {
             }]}).then(m => { m.pin().then(mm => { mm.channel.messages.cache.forEach(e => { if(e.system) e.delete() }) }) })
 
             await validation.edit({embeds: [{color: 'GREEN', title: 'La commande a été validée !', description: 'Création du tournoi...'}]})
-            await message.guild.roles.create({data: {
+            await message.guild.roles.create({
                 name: `Tournoi ${nomdutournoi}`,
                 color: 'DARK_AQUA',
-                mentionnable: false
-            }})
-                .then(role => roleTournoi = role.id)
+                mentionnable: false,
+                reason: 'Rôle tournoi'
+            }).then(role => roleTournoi = role.id)
             const tournoi = {
                 guildID: message.guild.id,
                 InscriptionsChannelID: InscriptionsChannel.id,
@@ -347,17 +347,17 @@ module.exports.run = async (client, message, _args, settings) => {
             const inscriptionstime = tournoi.InscriptionsDate.valueOf()-Date.now()
 
             await validation.edit({embeds: [{color: 'GREEN', title: "Tournoi créé avec succès !"}]})
-            await client.createTournoi(tournoi)
-                .then(tn => client.clock((tnid, setings) => {
-                    client.emit('begintournoi', tnid, setings)
-                }, inscriptionstime, tn._id, settings))
+            const tnid = await client.createTournoi(tournoi)
+            client.clock(tn_id => {
+                client.emit('begintournoi', tn_id)
+            }, inscriptionstime, tnid)
             break
         default:
             return msg.edit(`<@${message.author.id}>, la commande a été annulée avec succès.`)
         }
-    /*} catch (e) {
-        return message.reply(canceled)*/
-    // eslint-disable-next-line no-unsafe-finally
-    } finally { return }
+    } catch (e) {
+        console.error();
+        // return message.reply(canceled)
+    }
 }
 module.exports.help = MESSAGES.Commandes.Tournaments.TOURNOI;

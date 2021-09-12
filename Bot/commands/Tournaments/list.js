@@ -1,4 +1,3 @@
-const {Util} = require('discord.js')
 const {MESSAGES} = require('../../starterpack/constants')
 
 module.exports.run = async (client, message) => {
@@ -14,8 +13,8 @@ module.exports.run = async (client, message) => {
             inscrits += `<@${e.members[0].userid}>\n`
             pseudos += `---> ${e.members[0].pseudo}\n`
         });
-
-        return message.channel.send({embeds: [{title: `Liste des participants au tournoi ${tournoi.NomduTournoi} :`, color: 'BLUE', fields: [{name: 'Participants :', value: Util.splitMessage(inscrits), inline: true}, {name: 'Peudos de jeu :', value: Util.splitMessage(pseudos), inline: true}]}]})
+        console.log(inscrits, pseudos);
+        return message.channel.send({embeds: [{title: `Liste des participants au tournoi ${tournoi.NomduTournoi} :`, color: 'BLUE', fields: [{name: 'Participants :', value: inscrits, inline: true}, {name: 'Peudos de jeu :', value: pseudos, inline: true}]}]})
     }
     await tournoi.Inscrits.forEach(async e => {
         inscrits += `**__Équipe n°${tournoi.Inscrits.indexOf(e)+1} :__**\n`
@@ -30,8 +29,8 @@ module.exports.run = async (client, message) => {
         title: `Liste des participants au tournoi ${tournoi.NomduTournoi} :`,
         color: 'BLUE',
         fields:[
-            {name: 'Équipes :', value: Util.splitMessage(inscrits), inline: true},
-            {name: 'Peudos de jeu :', value: Util.splitMessage(pseudos), inline: true}
+            {name: 'Équipes :', value: inscrits, inline: true},
+            {name: 'Peudos de jeu :', value: pseudos, inline: true}
         ],
         footer: {text: `Nombre d'équipes inscrites : ${tournoi.Inscrits.length}/${tournoi.NbdeTeams}`},
         timestamp: Date.now()

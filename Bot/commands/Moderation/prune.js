@@ -13,7 +13,7 @@ module.exports.run = async (client, message, args, settings) => {
     await message.channel.messages.fetch({
         limit: Math.min(+args[1], 100),
         before: message.id,
-    }).then(coll => messages = coll.filter(a => a.author.id === member.id).map())
+    }).then(coll => messages = coll.filter(a => a.author.id === member.id))
 
     messages.length = Math.min(args[1], messages.length)
     if (messages.length === 0) {

@@ -38,8 +38,7 @@ module.exports.run = async (client, message, _args, settings) => {
     if (tournoi.Date.valueOf()-tournoi.InscriptionsFin<Date.now()) return message.reply("Les inscriptions sont terminées !")
     if (banned) return message.reply('Vous ne pouvez pas vous inscrire à ce tournoi.')
     if (registered) return message.reply("Vous étiez déjà inscrit.")
-    if (!places && maxed && !tournoi.Random) return message.reply('Il ne reste plus de places pour ce tournoi.')
-    if (tournoi.Random && tournoi.NbdeTeams*tournoi.Compo <= tournoi.Inscrits.length) return message.reply('Il ne reste plus de places pour ce tournoi.')
+    if (!places && maxed && !tournoi.Random||tournoi.Random && tournoi.NbdeTeams*tournoi.Compo <= tournoi.Inscrits.length) return message.reply('Il ne reste plus de places pour ce tournoi.')
     if (tournoi.Compo > 1 && !tournoi.Random) {
         await message.reply("Merci de regarder vos MP pour continuer votre inscription.")
         try {

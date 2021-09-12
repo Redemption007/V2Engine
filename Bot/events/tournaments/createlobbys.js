@@ -9,11 +9,11 @@ module.exports = async (client, tournoiid) => {
     let field2 = ''
     let nbrooms = Math.ceil((Tournoi.Inscrits.length-1)/Tournoi.Lobbys)
     const creation_lobbys = numberlobby => {
-        edit = {embeds: [{
+        edit = {
             color: 'ORANGE',
             title: `Création du lobby ${numberlobby} et de ses permissions...`,
             footer: {text: "Merci de patienter pendant la création du Tournoi : tout est automatique."}
-        }]}
+        }
 
         return edit
     }
@@ -27,7 +27,7 @@ module.exports = async (client, tournoiid) => {
         let lobby = `**__Lobby n°${i+1} :__**`
         let pseudos = ``
 
-        await message.edit('Merci de patienter...', creation_lobbys(i+1))
+        await message.edit({content: 'Merci de patienter...', embeds: [creation_lobbys(i+1)]})
         await guild.channels.create(`lobby-${i+1}`, {
             type: 'text',
             parent: StaffChannel.parentID,
@@ -55,7 +55,7 @@ module.exports = async (client, tournoiid) => {
                 await Tournoi.Inscrits[j+Tournoi.Lobbys*i].members.forEach(async mbr => {
                     lobby += `\n<@${mbr.userid}> --`
                     pseudos += `\n -> ${mbr.pseudo}`
-                    await lobbys[i].updateOverwrite(mbr.userid, {
+                    await lobbys[i].permissionOverwrites.create(mbr.userid, {
                         'MANAGE_CHANNELS': false,
                         'ADD_REACTIONS': true,
                         'VIEW_CHANNEL': true,
@@ -76,18 +76,16 @@ module.exports = async (client, tournoiid) => {
         Tournoi.NextRound[0] = "Finale"
         Tournoi.NextRound[1] = lobbys[0].id
     }
-    await message.edit('Merci de patienter...', {embeds: [{title: 'Envoi des informations dans chaque lobby...', color: 'ORANGE', footer: {text: "Merci de patienter pendant la création du tournoi : tout est automatique."}}]})
+    await message.edit({content: 'Merci de patienter...', embeds: [{title: 'Envoi des informations dans chaque lobby...', color: 'ORANGE', footer: {text: "Merci de patienter pendant la création du tournoi : tout est automatique."}}]})
     await lobbys.forEach(lobby => {
-        lobby.send('@everyone', {embeds: [{title: 'Instructions :', description: `Bienvenue dans le <#${lobby.id}>\n\nMerci de vous entendre entre vous pour créer une room et jouer ensemble.\n\n> Une fois vos parties finies, merci de taper la commande \`${settings.prefix}submit\` et de suivre les instructions pour pouvoir continuer le tournoi.`, footer: {text: 'Bon tournoi à tous !'}, color: 'AQUA'}]})
+        lobby.send({content: '@everyone', embeds: [{title: 'Instructions :', description: `Bienvenue dans le <#${lobby.id}>\n\nMerci de vous entendre entre vous pour créer une room et jouer ensemble.\n\n> Une fois vos parties finies, merci de taper la commande \`${settings.prefix}submit\` et de suivre les instructions pour pouvoir continuer le tournoi.`, footer: {text: 'Bon tournoi à tous !'}, color: 'AQUA'}]})
     })
-    await message.edit("Création des lobbys terminée ! Les informations ont été envoyées ! Tout est prêt pour le tournoi.", {
-        embeds: [{
-            title: 'Voici la liste des lobbys et leurs équipes :',
-            color: 'DARK_GREEN',
-            fields: [{name: 'Équipes :', value: field1, inline: true}, {name: 'Pseudos :', value: field2, inline: true}],
-            footer: {text: `Nous vous remercions de votre patience. Faites \`${settings.prefix}help check\` pour savoir comment déclarer un vainqueur.`}
-        }]
-    })
+    await message.edit({content: "Création des lobbys terminée ! Les informations ont été envoyées ! Tout est prêt pour le tournoi.", embeds: [{
+        title: 'Voici la liste des lobbys et leurs équipes :',
+        color: 'DARK_GREEN',
+        fields: [{name: 'Équipes :', value: field1, inline: true}, {name: 'Pseudos :', value: field2, inline: true}],
+        footer: {text: `Nous vous remercions de votre patience. Faites \`${settings.prefix}help check\` pour savoir comment déclarer un vainqueur.`}
+    }]})
 
     return message.pin()
 }

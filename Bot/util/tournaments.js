@@ -1,3 +1,4 @@
+/* eslint-disable no-multi-spaces */
 const mongoose = require('mongoose');
 const Tournoi = require('../modeles/tournoi');
 
@@ -6,8 +7,8 @@ module.exports = client => {
     client.createTournoi = async tournoi => {
         const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, tournoi)
         const createTournoi = await new Tournoi(merged)
-
-        return createTournoi.save(function (err) { if (err) console.error(); })
+        await createTournoi.save(function (err) { if (err) console.error(); })
+        return createTournoi._id
     }
 
     client.getTournoi = async object => {
@@ -133,41 +134,42 @@ module.exports = client => {
         let index = []
         let participants = await tournoi.Inscrits.length
 
-        for (let i=0; i < participants; i++) {
-            let random = participants
-            let teamid = 1000000000 + Math.round(Math.random()*1000000000)
+        for (let i=0; i < participants; i++) {                                     //Pour chaque participant
+            let random = participants                                              //Condition initiale pour rentrer dans la boucle ensuite
+            let teamid = 1000000000 + Math.round(Math.random()*1000000000)         //On crée un id au hasard
 
-            while (index.find(e => e === random) || random>= participants) {
-                random = Math.round(Math.random()*participants)
+            while (index.find(e => e === random) || random>= participants) {       //Si l'index correspondant à un participant est déjà dans la liste
+                random = Math.round(Math.random()*participants)                    //On prend un autre index au hasard
             }
-            index.push(random)
-            const user = await tournoi.Inscrits[random].members[0]
+            index.push(random)                                                     //Qu'on ajoute à la liste pour pas le choisir la prochaine fois
+            const user = await tournoi.Inscrits[random].members[0]                 //On choisit le membre correspondant à l'index choisi.
 
-            if (newlist.length >= tournoi.NbdeTeams) {
-                const dispo = newlist.findIndex(t => t.members.length < tournoi.Compo)
-
-                newlist[dispo].members.push(user)
+            if (newlist.length >= tournoi.NbdeTeams) {                             //Si la liste des équipes est pleine
+                const dispo = newlist.findIndex(t => t.members.length < tournoi.Compo)  //On cherche s'il n'y a pas une équipe incomplète
+                newlist[dispo].members.push(user)                                  //Auquel cas on y rajoute l'utilisateur
             } else {
-                newlist.push({id: teamid, members: [user]})
+                newlist.push({id: teamid, members: [user]})                        //Sinon, on rajoute une nouvelle équipe
             }
         }
-        const solos = await newlist.filter(t => t.members.length<tournoi.Compo)
+        const solos = await newlist.filter(t => t.members.length<tournoi.Compo)    //On check s'il reste au moins 2 équipes incomplètes
 
         if (solos) {
-            while (solos.length>1) {
+            while (solos.length>1) {                                               //Auquel cas on prend les deux premières équipes trouvées
                 const team1Index = await newlist.indexOf(solos[0])
-                const team2Index = await newlist.indexOf(solos[1])
-
+                const team2Index = await newlist.indexOf(solos[1])                 //Et on commence à compléter la première team avec des membres de la seconde
                 while (newlist[team1Index].members.length<tournoi.Compo || newlist[team2Index].members.length>0) {
                     await newlist[team1Index].members.push(newlist[team2Index].members[0])
-                    await newlist[team2Index].members.splice(0, 1)
+                    await newlist[team2Index].members.splice(0, 1)                 //En ajoutant les membres à la première et les supprimant de la seconde
                 }
-                if (newlist[team1Index].members.length >= tournoi.Compo) {
+                if (newlist[team2Index].members.length === 0) {                    //Si la seconde team est vide, on la supprime de la liste des équipes incomplètes
+                    await solos.splice(1, 1)
+                }
+                if (newlist[team1Index].members.length >= tournoi.Compo) {         //Si la première team est pleine, on la supprime de la liste des équipes incomplètes
                     await solos.splice(0, 1)
                 }
-            }
-            if (solos.length===1 && !tournoi.Incomplets) {
-                const index = await newlist.indexOf(solos[0])
+            }                                                                      //Et on recommence tant qu'il y a au moins 2 équipes incomplètes
+            if (solos.length===1 && !tournoi.Incomplets) {                         //S'il ne reste qu'une seule équipe incomplète alors qu'elles ne sont pas autorisées
+                const index = await newlist.indexOf(solos[0])                      //On désinscrit les utilisateurs concernés
                 const guild = await client.guilds.cache.find(guild => guild.id === tournoi.guildID)
 
                 await newlist[index].members.forEach(async mbr => {
@@ -178,10 +180,9 @@ module.exports = client => {
                 await newlist.splice(index, 1)
             }
         }
-        tournoi.Inscrits = newlist
-        await tournoi.save(function (err) { if (err) console.error(); })
-
-        return tournoi.Inscrits
+        tournoi.Inscrits = newlist                                                  //On remplace l'ancienne liste avec la nouvelle contenant les équipes formées
+        await tournoi.save(function (err) { if (err) console.error(); })            //Et on save
+        return tournoi.Inscrits                                                     //Tout en retournant la nouvelle liste des équipes pour pouvoir l'utiliser si besoin
     }
 
     client.nextRound = async (tournoi, team) => {

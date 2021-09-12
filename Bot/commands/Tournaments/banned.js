@@ -9,6 +9,6 @@ module.exports.run = async (client, message) => {
     for (let i=0; i<Guild.Banned.length; i++) {
         list += `• <@!${Guild.Banned[i]}>\n`
     }
-    return message.reply({embeds: [{color: 'RED', title: `Utilisateur${Guild.Banned.length>1?'s':''} banni${Guild.Banned.length>1?'s':''} des tournois :`, description: Util.splitMessage(list), footer: {text: `Total : ${Guild.Banned.length} utilisateur${Guild.Banned.length>1?'s':''}`}}]})
+    return message.reply({embeds: [{color: 'RED', title: `Utilisateur${Guild.Banned.length>1?'s':''} banni${Guild.Banned.length>1?'s':''} des tournois :`, description: `${Util.splitMessage(list)}`, footer: {text: `Total : ${Guild.Banned.length} utilisateur${Guild.Banned.length>1?'s':''}`}}]})
 }
 module.exports.help = MESSAGES.Commandes.Tournaments.BANNED;

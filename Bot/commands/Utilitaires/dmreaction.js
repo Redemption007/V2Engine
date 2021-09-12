@@ -89,7 +89,7 @@ Au-delà de cette durée, la commande sera annulée. Tapez `cancel` pour annuler
                     .setTitle('DMREACTION')
                     .setColor('PURPLE')
                     .addField('__Channel :__', `<#${channelID}>`, true)
-                    .addField('__Lien du message :__', `(Cliquez pour y aller)[https://discord.com/channels/${message.guild.id}/${channelID}/${messageID}]`, true)
+                    .addField('__Lien du message :__', `[Cliquez pour y aller](https://discord.com/channels/${message.guild.id}/${channelID}/${messageID})`, true)
                     .addField('__Réaction :__', `${Emoji}`, false)
                     .addField('__Contenu du DM :__', `:speech_balloon: ${contenuDM}`, false)
                     .setTimestamp()

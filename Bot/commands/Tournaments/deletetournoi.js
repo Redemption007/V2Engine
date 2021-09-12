@@ -7,7 +7,7 @@ module.exports.run = async (client, message) => {
     if (!tournoi) return message.reply('Vous n\'avez pas envoyé cette commande dans un channel staff de tournoi !')
     const StaffChannel = await guild.channels.fetch(tournoi.StaffChannelID)
     const InfosChannel = await guild.channels.cache.find(ch => ch.name === 'infos-tournoi' && ch.parentID === StaffChannel.parentID)
-    const category = await guild.channels.fetch(StaffChannel.parentID)
+    const category = await guild.channels.fetch(StaffChannel.parentId)
     const InscriptionsChannel = await guild.channels.fetch(tournoi.InscriptionsChannelID)
     const role = await guild.roles.fetch(tournoi.RoleTournoi)
 
