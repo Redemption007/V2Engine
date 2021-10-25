@@ -30,7 +30,9 @@ module.exports.run = async (client, message, args) => {
         console.log("Channel général redéfini !");
     }                                                                                        //SO FAR SO GOOD
     //On check s'il y a des réacteurs dans le salon qu'on va supprimer
-    const reactors = Reactor.find(r => {
+    //                                                          MongooseError: Query was already executed: Reactor.find({})
+    //                                                          Il faut supprimer le await, mais comment faire ? Voir conversation sur github
+    const reactors = await Reactor.find(r => {
         if (!r) return null
         return r.channelID === oldchannel.id
     })
