@@ -7,5 +7,5 @@ module.exports = (client, member) => {
         .setColor('RED')
         .setTimestamp()
 
-    client.channels.cache.get(client.config.CHANNELLOGID).send(log)
+    client.channels.cache.get(client.config.CHANNELLOGID).send({embeds: [log]})
 }

@@ -1,11 +1,11 @@
 const {MESSAGES} = require('../../starterpack/constants')
-const ms = require('ms')
+const ms = require('../../util/ms')
 
 module.exports.run = async (client, message) => {
     let tournoi = await client.getTournoi({InscriptionsChannelID: message.channel.id})
 
     if (!tournoi) tournoi = await client.getTournoi({StaffChannelID: message.channel.id})
-    if (!tournoi) return message.reply(' vous n\'avez pas envoyé la commande dans un salon d\'inscriptions.')
+    if (!tournoi) return message.reply('Vous n\'avez pas envoyé la commande dans un salon d\'inscriptions.')
     const timer = tournoi.Date.valueOf() - Date.now()
     let inscriptions = ''
     let inscriptionsdate = ''
@@ -43,7 +43,7 @@ module.exports.run = async (client, message) => {
     }
 
 
-    return message.reply({embed: {
+    return message.reply({embeds: [{
         color: 'AQUA',
         title: `Informations sur le tournoi ${tournoi.NomduTournoi} :`,
         fields: [
@@ -53,6 +53,6 @@ module.exports.run = async (client, message) => {
             {name: 'Nombre d\'équipes inscrites :', value: `${tournoi.Inscrits.length}/${tournoi.NbdeTeams}`},
         ],
         footer: {text: "Si le nombre d'équipes inscrites atteint son maximum, vous pouvez toujours essayer de vous inscrire en demandant à rejoindre une équipe au hasard."}
-    }})
+    }]})
 }
 module.exports.help = MESSAGES.Commandes.Tournaments.INFOS;

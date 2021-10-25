@@ -1,7 +1,7 @@
 const Discord = require('discord.js')
 
 module.exports = async (client, channel) => {
-    if (channel.type === 'dm') return;
+    if (channel.type === 'DM') return;
     const FetchGuildAuditLogs = await channel.guild.fetchAuditLogs({
         limit: 1,
         type: 'CHANNEL_CREATE'
@@ -13,7 +13,7 @@ module.exports = async (client, channel) => {
     if (!RoleMute) RoleMute = await channel.guild.roles.cache.find(r => r.name === 'Muted');
 
     if (RoleMute) {
-        await channel.createOverwrite(RoleMute, {
+        await channel.permissionOverwrites.create(RoleMute, {
             SEND_MESSAGES: false,
             ADD_REACTIONS: false,
             CONNECT: false
@@ -26,8 +26,8 @@ module.exports = async (client, channel) => {
         .setDescription(`Par <@${executor.id}>`, executor.displayAvatarURL())
         .addField('__Nom du salon :__', `<#${channel.id}> (${channel.name})`)
         .addField('__Catégorie :__', `${channel.parent}`)
-        .setFooter(`Type de salon : ${channel.type}`)
+        .setFooter(`Type de salon : ${client.typeOfChannel(channel)}`)
         .setTimestamp();
 
-    client.channels.cache.get(client.config.CHANNELLOGID).send(log)
+    client.channels.cache.get(settings.logChannel).send({embeds: [log]})
 }

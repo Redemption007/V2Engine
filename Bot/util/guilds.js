@@ -4,10 +4,10 @@ const Guild = require('../modeles/guild');
 module.exports = client => {
 
     client.createGuild = async guild => {
-        const merged = Object.assign({_id: mongoose.Types.ObjectId()}, guild);
+        const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, guild);
         const createGuild = await new Guild(merged);
 
-        createGuild.save()//.then(g => console.log(`\nNouveau serveur : ${g.guildName}`));
+        createGuild.save(function (err) { if (err) console.error(); })
     }
 
     client.getGuild = async guild => {

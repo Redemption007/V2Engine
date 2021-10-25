@@ -1,6 +1,5 @@
 /* eslint-disable no-multi-spaces */
 const mongoose = require('mongoose');
-
 const reactorSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     guildID: String,                        //ID du serveur
@@ -15,5 +14,4 @@ const reactorSchema = mongoose.Schema({
     },
     autre: Array,                           //ID du rôle à mettre, contenu du DM à evoyer, catégorie dans laquelle créer le ticket...
 })
-
 module.exports = mongoose.model('Reactor', reactorSchema);

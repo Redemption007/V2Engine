@@ -1,11 +1,10 @@
 const discord = require('discord.js');
-const embed = require('../../commands/Utilitaires/embed')
 let long = 0;
 
 module.exports = async (client, message) => {
 
     if (message.author.bot) return;
-    if (message.channel.type === 'dm') return client.emit('DM', message);
+    if (message.channel.type === 'DM') return client.emit('DM', message);
     const settings = await client.getGuild(message.guild)
     let dbUser = await client.getUser(message.member)
 
@@ -37,19 +36,20 @@ module.exports = async (client, message) => {
 
     if (!message.content.startsWith(settings.prefix)&&!message.content.startsWith(client.config.NAME)) return;
 
-    if (message.content === `${client.config.NAME} prefix`) return embed.run(client, message, `GOLD;; On m'a appelé ?;; Mon préfixe sur ce serveur est : \`${settings.prefix}\``)
+    if (message.content === `${client.config.NAME} prefix`) return message.reply({embeds: [{title: "On m'a appelé ?", color: 'GOLD', description: `Mon préfixe sur ce serveur est : \`${settings.prefix}\``}]})
 
     if (message.content.startsWith(settings.prefix)) {
         long = settings.prefix.length;
     } else {
         long = 23;
     }
-    const args = message.content.slice(long).split(' ');
+    const args = message.content.slice(long).split(' ').filter(i => i!=='');
     const commandName = args.shift().toLowerCase();
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.help.aliases && cmd.help.aliases.includes(commandName));
 
     if (!command) {
-        return embed.run(client, message, 'RED;; Oups !;; La commande demandée est inexistante...');
+        setTimeout(() => message.delete().catch(), 5000)
+        return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: "La commande demandée est inexistante..."}]})
     }
 
     if (command.help.arg && !args.length) {
@@ -58,42 +58,40 @@ module.exports = async (client, message) => {
         if (command.help.usage) {
             noArgsReply += `\nVoici comment utiliser la commande :\`${settings.prefix}${command.help.usage}\``
         }
-
+        setTimeout(() => message.delete().catch(), 5000)
         return message.channel.send(noArgsReply);
     }
 
     try {
-        if (command.help.Modo && !message.member.hasPermission('KICK_MEMBERS')||command.help.Admin && !message.member.hasPermission('ADMINISTRATOR')) {
-            const nope = new discord.MessageEmbed().
-                setTitle("Hélas !").
-                setColor("BLACK").
-                setTimestamp().
-                setDescription(`<@${message.author.id}>, tu n'as pas les permissions nécessaires pour éxécuter cette commande !`)
-
-
-            return message.channel.send(nope);
+        if (command.help.Modo && !message.member.permissions.has('KICK_MEMBERS')||command.help.Admin && !message.member.permissions.has('ADMINISTRATOR')) {
+            const nope = new discord.MessageEmbed()
+                .setTitle("Hélas !")
+                .setColor("BLACK")
+                .setTimestamp()
+                .setDescription(`<@${message.author.id}>, tu n'as pas les permissions nécessaires pour éxécuter cette commande !`)
+            setTimeout(() => message.delete().catch(), 5000)
+            return message.channel.send({embeds: [nope]});
         }
 
-        if (command.help.isUserModo && message.guild.member(message.mentions.users.first()).hasPermission('KICK_MEMBERS')) {
-            const nope = new discord.MessageEmbed().
-                setTitle("Hélaaa jeune chenapan !").
-                setColor("BLACK").
-                setTimestamp().
-                setDescription(`<@${message.author.id}>, tu ne peux pas éxécuter la commande ${command.help.name} sur un modérateur !`);
-
-
-            return message.channel.send(nope);
+        if (command.help.isUserModo && message.mentions.members.first().permissions.has('KICK_MEMBERS')) {
+            const nope = new discord.MessageEmbed()
+                .setTitle("Hélaaa jeune chenapan !")
+                .setColor("BLACK")
+                .setTimestamp()
+                .setDescription(`<@${message.author.id}>, tu ne peux pas éxécuter la commande ${command.help.name} sur un modérateur !`);
+            setTimeout(() => message.delete().catch(), 5000)
+            return message.channel.send({embeds: [nope]});
         }
 
     } catch (error) {
-        const nope = new discord.MessageEmbed().
-            setTitle("Houla !").
-            setColor("BLACK").
-            setTimestamp().
-            setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
-
-
-        return message.channel.send(nope);
+        if (message.mentions.users.first().id === client.user.id) return message.reply("Attends, t'as vraiment essayé de me troll là ?")
+        const nope = new discord.MessageEmbed()
+            .setTitle("Houla !")
+            .setColor("BLACK")
+            .setTimestamp()
+            .setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
+        setTimeout(() => message.delete().catch(), 5000)
+        return message.channel.send({embeds: [nope]});
     }
 
     if (!client.cooldowns.has(command.help.name)) {
@@ -111,13 +109,19 @@ module.exports = async (client, message) => {
             let plural = 'seconde'
 
             if (timeLeft.toFixed(0)>1) plural+='s';
-
-            return message.reply(`merci d'attendre ${timeLeft.toFixed(0)} ${plural} avant de ré-utiliser la commande \`${settings.prefix}${command.help.name}\`.`);
+            setTimeout(() => message.delete().catch(), 5000)
+            return message.reply(`Merci d'attendre ${timeLeft.toFixed(0)} ${plural} avant de ré-utiliser la commande \`${settings.prefix}${command.help.name}\`.`);
         }
     }
     tStamps.set(message.author.id, timeNow);
     setTimeout(() => tStamps.delete(message.author.id), cdAmount);
 
+    const Chan = message.channel
+    const _guild = message.guild
     await command.run(client, message, args, settings, dbUser);
-    message.delete();
+    setTimeout(() => message.delete().catch(async () => {
+        if (Chan.deleted) {
+            if (Chan.id === settings.generalChannel) await client.getGeneralChannel(_guild)
+        }
+    }), 2000)
 }

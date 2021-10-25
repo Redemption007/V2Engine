@@ -1,7 +1,7 @@
 const {MESSAGES} = require('../../starterpack/constants')
 const Discord = require('discord.js');
 
-module.exports.run = async (client, message, args) => {
+module.exports.run = async (client, message, args, settings) => {
     const user = await client.users.fetch(args[0]);
     const raison = args[1] || "Pas de raison spécifiée.";
 
@@ -29,8 +29,8 @@ module.exports.run = async (client, message, args) => {
         embed.addField('Raison', `${raison}`, false)
     }
 
-    client.channels.cache.get(client.config.CHANNELLOGID).send(log)
+    client.channels.cache.get(settings.logChannel).send({embeds: [log]})
 
-    return message.channel.send(embed);
+    return message.channel.send({embeds: [embed]});
 }
 module.exports.help = MESSAGES.Commandes.Moderation.UNBAN;

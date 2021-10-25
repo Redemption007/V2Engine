@@ -5,7 +5,7 @@ const {Reactor} = require("../../modeles/reactor")
 
 module.exports = async (client, MessageReaction, user) => {
     const emoji = await MessageReaction.emoji.name
-    const Message = await MessageReaction.message.channel.messages.fetch(MessageReaction.message.id)
+    const Message = await MessageReaction.message.fetch()
     const data = await Reactor.findOne(r => r.autre.find(chid => chid === MessageReaction.channel.id))
 
     if (!data || data.typeReactor !== 'Tournoi'|| !data.emojis.find(emoji)) return
@@ -16,7 +16,7 @@ module.exports = async (client, MessageReaction, user) => {
         const tournoi = await data.typeAction[0]
         const full = await tournoi.Inscrits.find(team => team.members.find(us => us.userid === user.id))
 
-        if (full.members.length >= tournoi.compo) return user.send({embed: {title: 'Oops !', description: 'Votre équipe est déjà complète, vous ne pouvez pas accepter ce membre !', color: 'RED'}})
+        if (full.members.length >= tournoi.compo) return user.send({embeds: [{title: 'Oops !', description: 'Votre équipe est déjà complète, vous ne pouvez pas accepter ce membre !', color: 'RED'}]})
 
         await client.deleteReactor(one, 'all')
         const guild = await client.guilds.fetch(tournoi.guildID)
@@ -27,7 +27,7 @@ module.exports = async (client, MessageReaction, user) => {
         await client.registerTournoi(tournoi, {teamid: team.id, userid: one.userid, pseudo: one.pseudo})
         await Message.delete()
 
-        return teammate.send({embed: {color: 'GREEN', title: 'Victoire !', description: `<@${user.id}> vous a accepté dans son équipe ! Tapez la commande \`${Guild.prefix}team\` pour en connaître la composition.`}})
+        return teammate.send({embeds: [{color: 'GREEN', title: 'Victoire !', description: `<@${user.id}> vous a accepté dans son équipe ! Tapez la commande \`${Guild.prefix}team\` pour en connaître la composition.`}]})
     case '❌':
         const index = await data.autres.findIndex(Message.id)
 

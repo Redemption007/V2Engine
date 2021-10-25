@@ -3,9 +3,8 @@
 const Discord = require('discord.js')
 const {MESSAGES} = require('../../starterpack/constants')
 
-module.exports.run = (client, message, args) => {
-    if (typeof args === 'array') args.join(' ')
-    const arg = args.split(';; ')
+module.exports.run = (_client, message, args) => {
+    const arg = args.join(' ').split(';; ')
     const embed = new Discord.MessageEmbed()
         .setColor(`${arg.shift()}`)
         .setTitle(`${arg.shift()}`)
@@ -15,10 +14,10 @@ module.exports.run = (client, message, args) => {
     try {
         embed.setFooter(`Intégration écrite par ${message.author.username}`, message.author.displayAvatarURL())
     } catch (e) {
-        return message.send(embed)
+        return message.send({embeds: [embed]})
     }
 
-    return message.channel.send(embed)
+    return message.channel.send({embeds: [embed]})
 }
 module.exports.help = MESSAGES.Commandes.Utilitaires.EMBED;
 

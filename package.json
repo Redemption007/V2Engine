@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "mongoose": "^6.0.5"
+  },
+  "name": "v2engine",
+  "author": {
+    "name": "Baptiste M.",
+    "email": "b.a.p.t.s.t.e7@gmail.com",
+    "url": "https://github.com/Redemption007/"
+  },
+  "version": "0.1.0",
+  "git repository": "https://github.com/Redemption007/V2Engine",
+  "devDependencies": {
+    "eslint": "^7.23.0"
+  },
+  "readme": "./README.md",
+  "description": "Modèle d'application : Bot Discord v13"
+}

@@ -17,6 +17,6 @@ module.exports = async (client, message) => {
         .setTimestamp()
         .setFooter(`Ticket ouvert le :`, msg.author.avatarURL());
 
-    client.channels.cache.get(client.config.CHANNELLOGID).send(log)
+    client.channels.cache.get(client.config.CHANNELLOGID).send({embeds: [log]})
     embed.run(client, msg, 'WHITE;; Votre ticket a bien été envoyé !')
 }
