@@ -34,7 +34,11 @@ module.exports = client => {
         if (typeof data !== "object") return data = {};
 
         for (const key in settings) {
-            await data[key].push(settings[key])
+            if (typeof data[key] == Array) {
+                await data[key].push(settings[key])
+            } else {
+                data[key] = settings[key]
+            }
         }
         return data.save(function (err) { if (err) console.error(); })
     }

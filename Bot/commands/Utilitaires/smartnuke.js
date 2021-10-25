@@ -30,11 +30,11 @@ module.exports.run = async (client, message, args) => {
         console.log("Channel général redéfini !");
     }                                                                                        //SO FAR SO GOOD
     //On check s'il y a des réacteurs dans le salon qu'on va supprimer
-    const reactors = await Reactor.find(r => {
+    const reactors = Reactor.find(r => {
         if (!r) return null
         return r.channelID === oldchannel.id
     })
-    console.log('reactors = ', reactors || 'Aucun !');
+    console.log('reactors = ', await reactors || 'Aucun !');
     let reactors_length = reactors.length
     console.log(`\nIl y a ${reactors_length} réacteurs à modifier !`);
     if (reactors_length) {
@@ -81,7 +81,7 @@ module.exports.run = async (client, message, args) => {
                 : options = {embeds: [pinnedMessages[i].embeds]}
             : options = {} //On modifie les options pour renvoyer la totalité des messages épinglés (contenu+PJ+embeds)
         const contenu = {content: `${(pinnedMessages[i].author.bot && !pinnedMessages[i].content.startsWith('> Auteur : '))? '':`> Auteur : ${pinnedMessages[i].author.username}${pinnedMessages[i].author.discriminator} (ID : \`${pinnedMessages[i].author.id}\`)\n\n`}`+pinnedMessages[i].content}
-        const newmsg = await newchannel.send({...contenu, ...options}) //Ceci marche ?
+        const newmsg = await newchannel.send({...contenu, ...options}) //Ceci marcherait ?
         await newmsg.pin() //Ceci marche of course
         if (reactors_length) {
             console.log(`Il reste ${reactors_length} réacteurs à modifier...`);
@@ -89,8 +89,7 @@ module.exports.run = async (client, message, args) => {
             const reac = await reactors.find(r => r.msgReactorID === pinnedMessages[i].id)
             if (reac) {
                 console.log(`Et le message épinglé n°${i} en est un !`);
-                reac.msgReactorID = newmsg.id
-                await reac.save()
+                await client.updateReactor({id: pinnedMessages[i].id}, {msgReactorID: newmsg.id})
                 for (let j=0; j<reac.emojis.length; j++) {
                     await newmsg.react(reac.emojis[j])
                 }
@@ -105,9 +104,10 @@ module.exports.run = async (client, message, args) => {
     if (senders.length) {
         console.log('\nModification de l\'envoi d\'informations des réacteurs');
         for (let j=0; j<senders.length; j++) {
-            const index = await senders[j].channelsending.indexOf(oldchannel.id)
-            senders[j].channelsending[index] = newchannel.id
-            await senders[j].save()
+            let newArray = senders[j].channelsending
+            const index = await newArray.indexOf(oldchannel.id)
+            newArray[index] = newchannel.id
+            await client.updateReactor({id: senders[j].msgReactorID}, {channelsending: newArray})
             console.log(`Sender n°${j+1}/${senders.length} modifié !`);
         }
         console.log("Tous les senders ont été modifiés avec succès.");
