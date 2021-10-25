@@ -74,9 +74,14 @@ module.exports.run = async (client, message, args) => {
     console.log('pinnedMessages = ', pinnedMessages || 'Aucun !');
     console.log(`\nIl y a ${pinnedMessages.length} messages épinglés !`);
     for (let i=pinnedMessages.length-1; i>=0; i--) {
-        let options = [] //PREVOIR UN CAS pour les messages épinglés qui viennent d'autres smartnukes et qui ont déjà la mention : "auteur : ..."
-        pinnedMessages[i].embeds? (pinnedMessages[i].attachments? options=[pinnedMessages[i].attachments, pinnedMessages[i].embeds].flat(2) : options=[pinnedMessages[i].embeds].flat(2)) : options=[] //On modifie les options pour renvoyer la totalité des messages épinglés (contenu+PJ+embeds)
-        const newmsg = await newchannel.send(`${pinnedMessages[i].author.bot? '':`> Auteur : ${pinnedMessages[i].author.username}${pinnedMessages[i].author.discriminator} (ID : \`${pinnedMessages[i].author.id}\`)\n\n`}`+pinnedMessages[i].content, options) //Ceci marche pour tous les messages non concernés par le cas cité ligne 77
+        let options = {}
+        pinnedMessages[i].embeds
+            ?pinnedMessages[i].attachments
+                ?options = {attachments: pinnedMessages[i].attachments, embeds: [pinnedMessages[i].embeds]}
+                : options = {embeds: [pinnedMessages[i].embeds]}
+            : options = {} //On modifie les options pour renvoyer la totalité des messages épinglés (contenu+PJ+embeds)
+        const contenu = {content: `${(pinnedMessages[i].author.bot && !pinnedMessages[i].content.startsWith('> Auteur : '))? '':`> Auteur : ${pinnedMessages[i].author.username}${pinnedMessages[i].author.discriminator} (ID : \`${pinnedMessages[i].author.id}\`)\n\n`}`+pinnedMessages[i].content}
+        const newmsg = await newchannel.send({...contenu, ...options}) //Ceci marche ?
         await newmsg.pin() //Ceci marche of course
         if (reactors_length) {
             console.log(`Il reste ${reactors_length} réacteurs à modifier...`);
