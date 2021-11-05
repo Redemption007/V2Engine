@@ -38,7 +38,7 @@ module.exports = client => {
 
     client.updateXP = async (member, guildID, XP) => {
         const UserToUpdate = await client.getUser(member)
-        const index = await UserToUpdate.guildIDs.findIndex(guildID)
+        const index = await UserToUpdate.guildIDs.indexOf(guildID)
         let xp = UserToUpdate.xp
         xp[index] += XP
 
