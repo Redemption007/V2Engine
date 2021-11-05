@@ -2,7 +2,7 @@
 /* eslint-disable no-extra-parens */
 /* eslint-disable no-nested-ternary */
 const {MESSAGES} = require('../../starterpack/constants')
-// const Tournoi = require('../../modeles/tournoi');
+const Tournoi = require('../../modeles/tournoi');
 const Reactor = require('../../modeles/reactor');
 
 module.exports.run = async (client, message, args) => {
@@ -32,15 +32,12 @@ module.exports.run = async (client, message, args) => {
     //On check s'il y a des réacteurs dans le salon qu'on va supprimer
     //                                                          MongooseError: Query was already executed: Reactor.find({})
     //                                                          Il faut supprimer le await, mais comment faire ? Voir conversation sur github
-    const reactors = await Reactor.find(r => {
-        if (!r) return null
-        return r.channelID === oldchannel.id
-    })
+    const reactors = await Reactor.find({channelID: oldchannel.id})
     console.log('reactors = ', await reactors || 'Aucun !');
     let reactors_length = reactors.length
     console.log(`\nIl y a ${reactors_length} réacteurs à modifier !`);
     if (reactors_length) {
-        console.log('Epinglage des réacteurs');
+        console.log('Epinglage des réacteurs :');
         //Si oui, on les épingle tous quand ils ne sont pas épinglés
         for(let i=0; i<reactors_length; i++) {
             const msgReactor = await oldchannel.messages.fetch(reactors[i].msgReactorID)
@@ -49,13 +46,16 @@ module.exports.run = async (client, message, args) => {
                     reactors_length--
                     i--
                 })
-            if (!msgReactor.pinned) await msgReactor.pin()
-            console.log(`Réacteur n°${i}/${reactors_length} épinglé !`);
+            if (!msgReactor.pinned) {
+                await msgReactor.pin()
+                console.log(`Réacteur n°${i+1}/${reactors_length} déjà épinglé !`);
+            } else {
+                console.log(`Réacteur n°${i+1}/${reactors_length} épinglé !`);
+            }
         }
-    }
-    console.log('Epinglage des réacteurs fini, si tout se déroule bien !');
+    }//                                                                                                                                                        OK !!!!
     // Ensuite on checke les tournois, et si le channel est un channel de tournoi, on change l'id dans la DB, et on ré-envoie les informations dans le channel.
-    /*const tournois = await Tournoi.find(t => t && t.guildID === message.guild.id)
+    const tournois = await Tournoi.find(t => t && t.guildID === message.guild.id)
     // console.log('tournois = ', tournois || 'Aucun !');
     if (tournois) { //Ceci marche j'ai l'impression, à vérifier une fois les réacteurs finis
         for (let i=0; i<tournois.length; i++) {
@@ -69,29 +69,35 @@ module.exports.run = async (client, message, args) => {
                 await tournois[i].save()
             }
         }
-    }*/
+    }
     //On prend tous les messages épinglés du salon qui va être supprimé et on les envoie chronologiquement dans le nouveau salon.
     let pinnedMessages = await oldchannel.messages.fetchPinned()
-    pinnedMessages = pinnedMessages.array()
     console.log('pinnedMessages = ', pinnedMessages || 'Aucun !');
-    console.log(`\nIl y a ${pinnedMessages.length} messages épinglés !`);
-    for (let i=pinnedMessages.length-1; i>=0; i--) {
+    const keys = await pinnedMessages.keys()
+    console.log(`\nIl y a ${pinnedMessages.size} messages épinglés !`);
+    for (let i=pinnedMessages.size-1; i>=0; i--) {
         let options = {}
-        pinnedMessages[i].embeds
-            ?pinnedMessages[i].attachments
-                ?options = {attachments: pinnedMessages[i].attachments, embeds: [pinnedMessages[i].embeds]}
-                : options = {embeds: [pinnedMessages[i].embeds]}
+        let theOne = pinnedMessages.get(keys.next().value)
+        theOne.embeds
+            ?theOne.attachments
+                ?options = {attachments: theOne.attachments, embeds: theOne.embeds}
+                : options = {embeds: theOne.embeds}
             : options = {} //On modifie les options pour renvoyer la totalité des messages épinglés (contenu+PJ+embeds)
-        const contenu = {content: `${(pinnedMessages[i].author.bot && !pinnedMessages[i].content.startsWith('> Auteur : '))? '':`> Auteur : ${pinnedMessages[i].author.username}${pinnedMessages[i].author.discriminator} (ID : \`${pinnedMessages[i].author.id}\`)\n\n`}`+pinnedMessages[i].content}
-        const newmsg = await newchannel.send({...contenu, ...options}) //Ceci marcherait ?
+        const contenu = {content: (theOne.author.bot?'' : `> Auteur : ${theOne.author.username}#${theOne.author.discriminator} (ID : \`${theOne.author.id}\`)\n\n`)+theOne.content}
+        let newmsg
+        if (!contenu.content.length) {
+            newmsg = await newchannel.send(options)
+        } else {
+            newmsg = await newchannel.send({...contenu, ...options})
+        }
         await newmsg.pin() //Ceci marche of course
         if (reactors_length) {
             console.log(`Il reste ${reactors_length} réacteurs à modifier...`);
-            //Je ne sais pas si ce code marche, à vérifier
-            const reac = await reactors.find(r => r.msgReactorID === pinnedMessages[i].id)
+            //Ce code marche !
+            const reac = await reactors.find(r => r.msgReactorID === theOne.id)
             if (reac) {
                 console.log(`Et le message épinglé n°${i} en est un !`);
-                await client.updateReactor({id: pinnedMessages[i].id}, {msgReactorID: newmsg.id})
+                await client.updateReactor({id: theOne.id}, {msgReactorID: newmsg.id})
                 for (let j=0; j<reac.emojis.length; j++) {
                     await newmsg.react(reac.emojis[j])
                 }
@@ -100,8 +106,8 @@ module.exports.run = async (client, message, args) => {
         }
     }
     console.log("Il n'y a plus de messages épinglés à envoyer, ni de réacteurs à modifier.\n");
-    const senders = await Reactor.find(re => re && re.guildID == oldchannel.guild.id && re.channelsending.includes(oldchannel.id))
-    //PROBLEME ICI, tous les documents sont sélectionnés. A voir comment faire pour régler ça  #  Modifications faites, à voir si le problème est réglé.
+    let senders = await Reactor.find({guildID: oldchannel.guild.id})
+    senders = await senders.filter(re => re.channelsending.includes(oldchannel.id))
     console.log('senders = ', senders || 'Aucun !');
     if (senders.length) {
         console.log('\nModification de l\'envoi d\'informations des réacteurs');
