@@ -19,7 +19,7 @@ module.exports = async (client, message) => {
         }).then(user => dbUser = user)
     }
     // ATTENTION, j'ai intriduit des tableaux pour le multi serveurs !
-    const index = await dbUser.guildIDs.findIndex(message.guild.id)
+    const index = await dbUser.guildIDs.indexOf(message.guild.id)
     const xpCooldown = Math.floor(Math.random()*4 +1)
     const xpToAdd = Math.floor(Math.random()*25 +10)
 
