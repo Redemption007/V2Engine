@@ -30,8 +30,6 @@ module.exports.run = async (client, message, args) => {
         console.log("Channel général redéfini !");
     }                                                                                        //SO FAR SO GOOD
     //On check s'il y a des réacteurs dans le salon qu'on va supprimer
-    //                                                          MongooseError: Query was already executed: Reactor.find({})
-    //                                                          Il faut supprimer le await, mais comment faire ? Voir conversation sur github
     const reactors = await Reactor.find({channelID: oldchannel.id})
     console.log('reactors = ', await reactors || 'Aucun !');
     let reactors_length = reactors.length
@@ -55,7 +53,7 @@ module.exports.run = async (client, message, args) => {
         }
     }//                                                                                                                                                        OK !!!!
     // Ensuite on checke les tournois, et si le channel est un channel de tournoi, on change l'id dans la DB, et on ré-envoie les informations dans le channel.
-    const tournois = await Tournoi.find(t => t && t.guildID === message.guild.id)
+    const tournois = await Tournoi.find({guildID: message.guild.id})
     // console.log('tournois = ', tournois || 'Aucun !');
     if (tournois) { //Ceci marche j'ai l'impression, à vérifier une fois les réacteurs finis
         for (let i=0; i<tournois.length; i++) {
