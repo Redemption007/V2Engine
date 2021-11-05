@@ -104,6 +104,9 @@ module.exports = client => {
             return "Cette catégorie est réservée aux modérateurs & administrateurs du serveur. Elle regroupe toute les commandes nécessaires pour modérer un serveur."
         case 'admin':
             return "Cette catégorie est réservée aux administrateurs du serveur. Elle regroupe toutes les commandes pour paramétrer le bot sur le serveur."
+        case 'tournaments':
+        case 'tournament':
+        case 'tournois':
         case 'tournoi':
             return "Cette catégorie n'est active que si des tournois sont en cours sur le serveur. Elle regroupe toutes les commandes concernant de près ou de loin les tournois, même celles de modération de tournois."
         case 'owner':
