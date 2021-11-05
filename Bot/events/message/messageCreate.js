@@ -8,7 +8,7 @@ module.exports = async (client, message) => {
     let dbUser = await client.getUser(message.member)
 
     if (!dbUser) {
-        dbUser = await client.createUser({
+        await client.createUser({
             guildIDs: [message.member.guild.id],
             userID: message.author.id,
             username: message.member.user.tag,
@@ -16,24 +16,26 @@ module.exports = async (client, message) => {
             xp: [0],
             level: [0]
         })
-        console.log(dbUser)
+    } else {
         let index = await dbUser.guildIDs.indexOf(message.guild.id)
-        console.log(index);
         if (index == -1) {
+            index = await dbUser.guildIDs.length
             await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
-            index = await dbUser.guildIDs.indexOf(message.guild.id)
         }
         const xpCooldown = Math.floor(Math.random()*4 +1)
         const xpToAdd = Math.floor(Math.random()*25 +10)
 
-        if (xpCooldown === 4) await client.updateXP(message.member, xpToAdd)
+        if (xpCooldown === 4) await client.updateXP(message.member, message.guild.id, xpToAdd)
 
-        const userLevel = Math.floor(0.1*Math.sqrt(dbUser.xp))
+        const userLevel = Math.floor(0.1*Math.sqrt(dbUser.xp[index]))
 
-        if (dbUser.level !== userLevel) {
-            if (dbUser.level.index < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
-            if (dbUser.level.index > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp.index} et tu es donc descendu au niveau ${userLevel} !`)
-            client.updateUser(message.member, {level: userLevel})
+        console.log(userLevel, '    et    ', dbUser.level[index]);
+        if (dbUser.level[index] !== userLevel) {
+            if (dbUser.level[index] < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
+            if (dbUser.level[index] > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`)
+            let userLevels = dbUser.level
+            userLevels[index]=userLevel
+            client.updateUser(message.member, {level: userLevels})
         }
     }
 
@@ -122,6 +124,7 @@ module.exports = async (client, message) => {
 
     const Chan = message.channel
     const _guild = message.guild
+    dbUser = await client.getUser(message.member)
     await command.run(client, message, args, settings, dbUser);
     setTimeout(() => message.delete().catch(async () => {
         if (Chan.deleted) {
