@@ -29,7 +29,6 @@ module.exports = async (client, message) => {
 
         const userLevel = Math.floor(0.63*Math.log(dbUser.xp[index]))
 
-        console.log(userLevel, '    et    ', dbUser.level[index]);
         if (dbUser.level[index] !== userLevel) {
             if (dbUser.level[index] < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
             if (dbUser.level[index] > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`)

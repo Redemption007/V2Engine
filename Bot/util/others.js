@@ -108,6 +108,8 @@ module.exports = client => {
             return "Cette catégorie n'est active que si des tournois sont en cours sur le serveur. Elle regroupe toutes les commandes concernant de près ou de loin les tournois, même celles de modération de tournois."
         case 'owner':
             return "Cette catégorie, invisible, n'est accessible que par l'owner du bot. Elle regroupe toutes les commandes de test, en développement ou sensibles."
+        case 'utilitaires':
+            return "Cette catégorie regroupe les commandes servant à améliorer la vie du serveur. Jeux, informations utiles, raccourcis, vous y trouverez de tout !"
         default:
             "Cette catégorie regroupe les commandes servant à améliorer la vie du serveur. Jeux, informations utiles, raccourcis, vous y trouverez de tout !"
         }
