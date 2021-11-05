@@ -33,12 +33,15 @@ module.exports = client => {
 
     client.getGeneralChannel = async Guild => {
         const guild = await client.guilds.fetch(Guild.id)
-        let general = await guild.channels.cache.find(ch => ch.name.match(/(g[ée]n[ée]ral)|(t?chat)/))
-        if (!general) {
-            await guild.channels.fetch()
-                .then(channels => general = channels.find(one => one.type === 'GUILD_TEXT' && one.isText() && one.permissionsFor(client.user).has('SEND_MESSAGES')))
-        }
-        client.updateGuild(guild, {generalChannel: general.id})
+        await guild.channels.cache.find(ch => ch.name.match(/(g[ée]n[ée]ral)|(t?chat)/))
+            .then(general => client.updateGuild(guild, {generalChannel: general.id}))
+            .catch(async () => {
+                await guild.channels.fetch()
+                    .then(async channels => {
+                        const general = await channels.find(one => one.type === 'GUILD_TEXT' && one.isText() && one.permissionsFor(client.user).has('SEND_MESSAGES'))
+                        client.updateGuild(guild, {generalChannel: general.id})
+                    })
+            })
     }
 
     client.banGuild = async (guild, user) => {

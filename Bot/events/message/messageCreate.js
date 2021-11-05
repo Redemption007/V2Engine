@@ -30,8 +30,8 @@ module.exports = async (client, message) => {
         const userLevel = Math.floor(0.63*Math.log(dbUser.xp[index]))
 
         if (dbUser.level[index] !== userLevel) {
-            if (dbUser.level[index] < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
-            if (dbUser.level[index] > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`)
+            if (dbUser.level[index] < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`).catch(() => message.channel.send(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`))
+            if (dbUser.level[index] > Math.max(userLevel, 0)) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`).catch(() => message.channel.send(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`))
             let userLevels = dbUser.level
             userLevels[index]=userLevel
             client.updateUser(message.member, {level: userLevels})

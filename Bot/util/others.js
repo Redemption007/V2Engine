@@ -99,18 +99,21 @@ module.exports = client => {
 
     client.helpCategory = category => {
         switch (category) {
+        case 'admin':
+            return "Cette catégorie est réservée aux administrateurs du serveur. Elle regroupe toutes les commandes pour paramétrer le bot sur le serveur."
+        case 'helper':
+            return "Cette catégorie sert à vous aider et à vous orienter parmi les commandes du bot. Faites :\n- `help` pour obtenir la liste de toutes les catégories.\n- `help <categorie>` pour obtenir la liste des commandes pour une catégorie donnée.\n- `help <commande>` pour obtenir des informations sur une commande donnée."
         case 'moderation':
         case 'modération':
             return "Cette catégorie est réservée aux modérateurs & administrateurs du serveur. Elle regroupe toute les commandes nécessaires pour modérer un serveur."
-        case 'admin':
-            return "Cette catégorie est réservée aux administrateurs du serveur. Elle regroupe toutes les commandes pour paramétrer le bot sur le serveur."
+        case 'owner':
+            return "Cette catégorie, invisible, n'est accessible que par l'owner du bot. Elle regroupe toutes les commandes de test, en développement ou sensibles."
         case 'tournaments':
         case 'tournament':
         case 'tournois':
         case 'tournoi':
             return "Cette catégorie n'est active que si des tournois sont en cours sur le serveur. Elle regroupe toutes les commandes concernant de près ou de loin les tournois, même celles de modération de tournois."
-        case 'owner':
-            return "Cette catégorie, invisible, n'est accessible que par l'owner du bot. Elle regroupe toutes les commandes de test, en développement ou sensibles."
+        case 'utilitaire':
         case 'utilitaires':
             return "Cette catégorie regroupe les commandes servant à améliorer la vie du serveur. Jeux, informations utiles, raccourcis, vous y trouverez de tout !"
         default:
