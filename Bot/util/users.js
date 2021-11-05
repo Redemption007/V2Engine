@@ -18,7 +18,7 @@ module.exports = client => {
         if (data) return data;
     }
 
-    client.getUsers = async guild => { //ATENTION j'ai changé le modèle d'utilisateurs en introduisant des tableaux pour le multiguilde !
+    client.getUsers = async guild => {
         const data = await User.find({guildID: {$all:[guild.id]}});
 
         if (data) return data;
@@ -36,7 +36,7 @@ module.exports = client => {
         return data.updateOne(settings);
     }
 
-    client.updateXP = async (member, guildID, XP) => { //ATENTION j'ai changé le modèle d'utilisateurs en introduisant des tableaux pour le multiguilde !
+    client.updateXP = async (member, guildID, XP) => {
         const UserToUpdate = await client.getUser(member)
         const index = await UserToUpdate.guildIDs.findIndex(guildID)
         let xp = UserToUpdate.xp
