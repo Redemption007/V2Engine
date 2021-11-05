@@ -20,7 +20,7 @@ module.exports = async (client, message) => {
     let index = await dbUser.guildIDs.indexOf(message.guild.id)
     if (!index) {
         await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
-            .then(async us => index = await us.guildIDs.indexOf(message.guild.id))
+        index = await dbUser.guildIDs.indexOf(message.guild.id)
     }
     const xpCooldown = Math.floor(Math.random()*4 +1)
     const xpToAdd = Math.floor(Math.random()*25 +10)
