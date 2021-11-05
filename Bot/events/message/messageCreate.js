@@ -8,33 +8,34 @@ module.exports = async (client, message) => {
     let dbUser = await client.getUser(message.member)
 
     if (!dbUser) {
-        await client.createUser({
+        dbUser = await client.createUser({
             guildIDs: [message.member.guild.id],
             userID: message.author.id,
             username: message.member.user.tag,
             dmable: true,
             xp: [0],
             level: [0]
-        }).then(user => dbUser = user)
+        })
+        console.log(dbUser)
+        let index = await dbUser.guildIDs.indexOf(message.guild.id)
+        console.log(index);
+        if (index == -1) {
+            await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
+            index = await dbUser.guildIDs.indexOf(message.guild.id)
+        }
+        const xpCooldown = Math.floor(Math.random()*4 +1)
+        const xpToAdd = Math.floor(Math.random()*25 +10)
+
+        if (xpCooldown === 4) await client.updateXP(message.member, xpToAdd)
+
+        const userLevel = Math.floor(0.1*Math.sqrt(dbUser.xp))
+
+        if (dbUser.level !== userLevel) {
+            if (dbUser.level.index < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
+            if (dbUser.level.index > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp.index} et tu es donc descendu au niveau ${userLevel} !`)
+            client.updateUser(message.member, {level: userLevel})
+        }
     }
-    let index = await dbUser.guildIDs.indexOf(message.guild.id)
-    if (!index) {
-        await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
-        index = await dbUser.guildIDs.indexOf(message.guild.id)
-    }
-    const xpCooldown = Math.floor(Math.random()*4 +1)
-    const xpToAdd = Math.floor(Math.random()*25 +10)
-
-    if (xpCooldown === 4) await client.updateXP(message.member, xpToAdd)
-
-    const userLevel = Math.floor(0.1*Math.sqrt(dbUser.xp))
-
-    if (dbUser.level !== userLevel) {
-        if (dbUser.level.index < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
-        if (dbUser.level.index > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp.index} et tu es donc descendu au niveau ${userLevel} !`)
-        client.updateUser(message.member, {level: userLevel})
-    }
-
 
     if (!message.content.startsWith(settings.prefix)&&!message.content.startsWith(client.config.NAME)) return;
 
