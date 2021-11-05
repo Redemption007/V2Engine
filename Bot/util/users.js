@@ -7,8 +7,10 @@ module.exports = client => {
         const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, user);
         const createUser = await new User(merged);
 
-        createUser.save(function (err) { if (err) console.error(); })//.then(u => console.log(`\nNouvel utilisateur : ${u.username}`));
+        createUser.save(function (err) { if (err) console.error(); })
+        console.log(`Nouvel utilisateur : ${user.username} (${user.userID})`);
     }
+
 
     client.getUser = async user => {
         const data = await User.findOne({userID: user.id});
@@ -16,8 +18,8 @@ module.exports = client => {
         if (data) return data;
     }
 
-    client.getUsers = async guild => {
-        const data = await User.find({guildID: guild.id});
+    client.getUsers = async guild => { //ATENTION j'ai changé le modèle d'utilisateurs en introduisant des tableaux pour le multiguilde !
+        const data = await User.find({guildID: {$all:[guild.id]}});
 
         if (data) return data;
     }
@@ -34,10 +36,12 @@ module.exports = client => {
         return data.updateOne(settings);
     }
 
-    client.updateXP = async (member, XP) => {
+    client.updateXP = async (member, guildID, XP) => { //ATENTION j'ai changé le modèle d'utilisateurs en introduisant des tableaux pour le multiguilde !
         const UserToUpdate = await client.getUser(member)
-        const updatedXP = await UserToUpdate.xp + XP
+        const index = await UserToUpdate.guildIDs.findIndex(guildID)
+        let xp = UserToUpdate.xp
+        xp[index] += XP
 
-        await client.updateUser(member, {xp: updatedXP})
+        await client.updateUser(member, {xp: xp})
     }
 }

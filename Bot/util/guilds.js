@@ -8,6 +8,7 @@ module.exports = client => {
         const createGuild = await new Guild(merged);
 
         createGuild.save(function (err) { if (err) console.error(); })
+        console.log(`Nouveau serveur : ${guild.guildName} (${guild.guildID})`);
     }
 
     client.getGuild = async guild => {
@@ -34,13 +35,8 @@ module.exports = client => {
         const guild = await client.guilds.fetch(Guild.id)
         let general = await guild.channels.cache.find(ch => ch.name.match(/(g[ée]n[ée]ral)|(t?chat)/))
         if (!general) {
-            let max = 0
-            for (let i = 0; i < guild.channels.length; i++) {
-                if (max<guild.channels.cache[i].members.length) {
-                    max = guild.channels.cache[i].members.length
-                    general = guild.channels.cache[i]
-                }
-            }
+            await guild.channels.fetch()
+                .then(channels => general = channels.find(one => one.type === 'GUILD_TEXT' && one.isText() && one.permissionsFor(client.user).has('SEND_MESSAGES')))
         }
         client.updateGuild(guild, {generalChannel: general.id})
     }

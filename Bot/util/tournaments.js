@@ -8,6 +8,7 @@ module.exports = client => {
         const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, tournoi)
         const createTournoi = await new Tournoi(merged)
         await createTournoi.save(function (err) { if (err) console.error(); })
+        console.log(`Nouveau tournoi : ${tournoi.NomduTournoi} (Serveur :${tournoi.guildID})`);
         return createTournoi._id
     }
 

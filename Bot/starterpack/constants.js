@@ -89,6 +89,18 @@ const MESSAGES = {
                 Admin: true,
                 Modo: false,
             },
+            BANN: {
+                name: "bann",
+                category: 'Moderation',
+                aliases: ["bann", "banne", "baan", "bn", "ciao"],
+                description: "Trolle un utilisateur en l'annonçant banni.",
+                cooldown: 5,
+                arg: true,
+                usage: "bann <@user> <raison>",
+                isUserModo: false,
+                Admin: false,
+                Modo: true,
+            },
             DELETEXP: {
                 name: "deletexp",
                 category: 'Moderation',

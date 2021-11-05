@@ -10,16 +10,17 @@ module.exports = async (client, message) => {
 
     if (!dbUser) {
         await client.createUser({
-            guildID: message.member.guild.id,
-            guildName: message.member.guild.name,
+            guildIDs: [message.member.guild.id],
             userID: message.author.id,
             username: message.member.user.tag,
             dmable: true,
-            xp: 0,
-            level: 0
+            xp: [0],
+            level: [0]
         })
         dbUser = await client.getUser(message.author)
     }
+    // ATTENTION, j'ai intriduit des tableaux pour le multi serveurs !
+    const index = await dbUser.guildIDs.findIndex(message.guild.id)
     const xpCooldown = Math.floor(Math.random()*4 +1)
     const xpToAdd = Math.floor(Math.random()*25 +10)
 
@@ -28,8 +29,8 @@ module.exports = async (client, message) => {
     const userLevel = Math.floor(0.1*Math.sqrt(dbUser.xp))
 
     if (dbUser.level !== userLevel) {
-        if (dbUser.level < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
-        if (dbUser.level > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp} et tu es donc descendu au niveau ${userLevel} !`)
+        if (dbUser.level[index] < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`)
+        if (dbUser.level[index] > userLevel) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`)
         client.updateUser(message.member, {level: userLevel})
     }
 
