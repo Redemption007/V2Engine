@@ -27,7 +27,7 @@ module.exports = async (client, message) => {
 
         if (xpCooldown === 4) await client.updateXP(message.member, message.guild.id, xpToAdd)
 
-        const userLevel = Math.floor(0.1*Math.sqrt(dbUser.xp[index]))
+        const userLevel = Math.floor(0.63*Math.log(dbUser.xp[index]))
 
         console.log(userLevel, '    et    ', dbUser.level[index]);
         if (dbUser.level[index] !== userLevel) {

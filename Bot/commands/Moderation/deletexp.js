@@ -9,15 +9,17 @@ module.exports.run = async (client, message, args, settings) => {
         xp = +args[0]
     }
     const dbUserMentionned = await client.getUser(member)
+    const index = await dbUserMentionned.guildIDs.indexOf(message.guild.id)
 
     //On vérifie que pour chaque cas, xp est bien un nombre et que le membre est valide
     if (isNaN(xp) || !dbUserMentionned) return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: `Voici la forme de la commande : ${settings.prefix}${MESSAGES.Commandes.Moderation.DELETEXP.usage}`}]})
 
 
-    if (dbUserMentionned.xp === 0) return message.reply({embeds: [{color: 'RED', title: 'AH !', description: `L'utilisateur concerné n'a aucun points d'xp !`}]})
+    if (dbUserMentionned.xp[index] === 0) return message.reply({embeds: [{color: 'RED', title: 'AH !', description: `L'utilisateur concerné n'a aucun points d'xp !`}]})
 
-    await client.updateXP(member, -xp)
+    await client.updateXP(member, message.guild.id, -Math.abs(xp))
 
-    return message.reply({embeds: [{color: 'BLUE', title: 'Supression d\'xp réussie !', description: `Vous avez supprimé ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${dbUserMentionned.xp-xp}`}]})
+    return message.reply({embeds: [{color: 'BLUE', title: 'Supression d\'xp réussie !', description: `Vous avez supprimé ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${dbUserMentionned.xp[index]-xp}`}]})
 }
 module.exports.help = MESSAGES.Commandes.Moderation.DELETEXP;
+
