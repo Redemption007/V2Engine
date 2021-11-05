@@ -16,5 +16,8 @@
     "eslint": "^7.23.0"
   },
   "readme": "./README.md",
-  "description": "Modèle d'application : Bot Discord v13"
+  "description": "Modèle d'application : Bot Discord v13",
+  "engines": {
+    "node": "16.9.0"
+  }
 }
