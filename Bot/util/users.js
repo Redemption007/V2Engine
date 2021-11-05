@@ -7,8 +7,8 @@ module.exports = client => {
         const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, user);
         const createUser = await new User(merged);
 
-        createUser.save(function (err) { if (err) console.error(); })
         console.log(`Nouvel utilisateur : ${user.username} (${user.userID})`);
+        return createUser.save(function (err) { if (err) console.error(); })
     }
 
 

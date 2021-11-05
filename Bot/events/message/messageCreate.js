@@ -16,8 +16,7 @@ module.exports = async (client, message) => {
             dmable: true,
             xp: [0],
             level: [0]
-        })
-        dbUser = await client.getUser(message.author)
+        }).then(user => dbUser = user)
     }
     // ATTENTION, j'ai intriduit des tableaux pour le multi serveurs !
     const index = await dbUser.guildIDs.findIndex(message.guild.id)
