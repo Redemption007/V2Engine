@@ -6,7 +6,6 @@ module.exports.run = async (client, message, args, settings) => {
     //Couleurs
     const gris = "#797979"
     const gris_clair = '#767E8D'
-    const gris_discord = '#2F3136'
     const orange = '#F2AA26'
     const rouge = '#dc143c'
     const rouge_dnd = '#E4324B'
@@ -25,6 +24,7 @@ module.exports.run = async (client, message, args, settings) => {
     const canvas = createCanvas(x_tot, y_tot)
     const ctx = canvas.getContext('2d')
     const background = await loadImage('https://cdn.discordapp.com/attachments/906726350323335189/906726565566627900/screen_mc.png')
+    const font = 'fixed'
     const font_size = 30
 
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
@@ -56,7 +56,7 @@ module.exports.run = async (client, message, args, settings) => {
             ctx.stroke();
             ctx.fill()
             //Rectangle noir :
-            ctx.fillStyle = gris_discord
+            ctx.fillStyle = '#000'
             ctx.fillRect(x_presence-rayon/7, y_presence-2.5, 2*rayon/7, 5)
             ctx.closePath();
             return
@@ -140,7 +140,7 @@ module.exports.run = async (client, message, args, settings) => {
         avatar = await loadImage(member.user.displayAvatarURL({format: 'jpg'}))
     }
     //Positions
-    ctx.font = `${font_size}px sans`
+    ctx.font = `${font_size}px ${font}`
     const y_discriminator = y_arc-rayon+40
     const x_discriminator = Math.min(x_arc+rayon+5+ctx.measureText(tag[0]).width, 375)
 
@@ -179,28 +179,28 @@ module.exports.run = async (client, message, args, settings) => {
 
     //Level :
     ctx.textAlign = "left"
-    ctx.font = `${font_size}px sans`
+    ctx.font = `${font_size}px ${font}`
     ctx.fillText(level, x_arc+rayon+100, y_arc+15)
     ctx.fillStyle = gris
-    ctx.font = `${font_size-15}px sans`
+    ctx.font = `${font_size-15}px ${font}`
     ctx.fillText('NIVEAU : ', x_arc+rayon+20, y_arc+15)
 
     //Tag :
     ctx.fillStyle = '#fff'
-    ctx.font = `${font_size-i}px sans-serif`
+    ctx.font = `${font_size-i}px ${font}`
     ctx.textAlign = 'left'
     ctx.fillText(tag[0], x_arc+rayon+5, y_discriminator)
-    ctx.font = `${font_size-12}px sans`
+    ctx.font = `${font_size-12}px ${font}`
     ctx.fillStyle = gris
     ctx.fillText('#'+tag[1], x_discriminator, y_discriminator)
 
     //Rang :
     ctx.textAlign = 'right'
     ctx.fillStyle = '#fff'
-    ctx.font = `${font_size+10}px sans`
+    ctx.font = `${font_size+10}px ${font}`
     const x_rang = x_tot-x_espace-15-ctx.measureText(`#1`).width
     ctx.fillText(`#`+rang, x_tot-x_espace-15, y_discriminator)
-    ctx.font = `${font_size-15}px sans`
+    ctx.font = `${font_size-15}px ${font}`
     ctx.fillStyle = gris
     ctx.fillText('RANG : ', x_rang, y_discriminator)
 

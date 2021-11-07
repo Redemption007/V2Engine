@@ -42,6 +42,7 @@ module.exports = async (client, message) => {
     }
 
     if (!message.content.startsWith(settings.prefix)&&!message.content.startsWith(client.config.NAME)) return;
+    if (message.content===';-;') return
 
     if (message.content === `${client.config.NAME} prefix`) return message.reply({embeds: [{title: "On m'a appelé ?", color: 'GOLD', description: `Mon préfixe sur ce serveur est : \`${settings.prefix}\``}]})
     
@@ -60,17 +61,8 @@ module.exports = async (client, message) => {
         return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: "La commande demandée est inexistante..."}]})
     }
 
-    if (command.help.arg && !args.length) {
-        let noArgsReply = `Il faut des arguments pour cette commande, ${message.author} !`;
-
-        if (command.help.usage) {
-            noArgsReply += `\nVoici comment utiliser la commande :\`${settings.prefix}${command.help.usage}\``
-        }
-        setTimeout(() => message.delete().catch(), 5000)
-        return message.channel.send(noArgsReply);
-    }
-
     try {
+        if (command.help.isUserModo && message.mentions.users.first().id === client.user.id) return message.reply("Attends, t'as vraiment essayé de me troll là ?")
         if (command.help.Modo && !message.member.permissions.has('KICK_MEMBERS')||command.help.Admin && !message.member.permissions.has('ADMINISTRATOR')) {
             const nope = new discord.MessageEmbed()
                 .setTitle("Hélas !")
@@ -92,7 +84,6 @@ module.exports = async (client, message) => {
         }
 
     } catch (error) {
-        if (message.mentions.users.first().id === client.user.id) return message.reply("Attends, t'as vraiment essayé de me troll là ?")
         const nope = new discord.MessageEmbed()
             .setTitle("Houla !")
             .setColor("BLACK")
@@ -100,6 +91,16 @@ module.exports = async (client, message) => {
             .setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
         setTimeout(() => message.delete().catch(), 5000)
         return message.channel.send({embeds: [nope]});
+    }
+
+    if (command.help.arg && !args.length) {
+        let noArgsReply = `Il faut des arguments pour cette commande, ${message.author} !`;
+
+        if (command.help.usage) {
+            noArgsReply += `\nVoici comment utiliser la commande :\`${settings.prefix}${command.help.usage}\``
+        }
+        setTimeout(() => message.delete().catch(), 5000)
+        return message.channel.send(noArgsReply);
     }
 
     if (!client.cooldowns.has(command.help.name)) {
