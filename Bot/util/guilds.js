@@ -69,13 +69,14 @@ module.exports = client => {
             const placeholder = lb[i]
             lb[i] = lb[i-1]
             lb[i-1] = placeholder
+            console.log('Places échangées !');
             return lb
         }
         const index = lb.findIndex(rang => rang[0]===member.id)
         if (!lb.length || index==-1) return guild.updateOne({$push: {leaderboard: [[member.id, xp]]}})
         lb[index][1]=xp
-        if (lb[index]>0 && lb[index-1][1]<=lb[index][1]) lb = exchange(index)
-        if (lb[index]+1<lb.length && lb[index+1][1]>=lb[index][1]) lb = exchange(index+1)
+        if (index>0 && lb[index-1][1]<=lb[index][1]) lb = exchange(index)
+        if (index+1<lb.length && lb[index+1][1]>=lb[index][1]) lb = exchange(index+1)
         return guild.updateOne({leaderboard: lb})
     }
 }
