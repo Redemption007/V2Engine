@@ -187,7 +187,7 @@ module.exports.run = async (client, message, args, settings) => {
 
     //Tag :
     ctx.fillStyle = '#fff'
-    ctx.font = `${font_size-i}px sans`
+    ctx.font = `${font_size-i}px sans-serif`
     ctx.textAlign = 'left'
     ctx.fillText(tag[0], x_arc+rayon+5, y_discriminator)
     ctx.font = `${font_size-12}px sans`
