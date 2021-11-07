@@ -1,5 +1,5 @@
 const {MESSAGES} = require('../../starterpack/constants')
-const {createCanvas, loadImage} = require('canvas')
+const {createCanvas, loadImage, registerFont} = require('canvas')
 const {MessageAttachment} = require('discord.js')
 
 module.exports.run = async (client, message, args, settings) => {
@@ -24,8 +24,9 @@ module.exports.run = async (client, message, args, settings) => {
     const canvas = createCanvas(x_tot, y_tot)
     const ctx = canvas.getContext('2d')
     const background = await loadImage('https://cdn.discordapp.com/attachments/906726350323335189/906726565566627900/screen_mc.png')
-    const font = 'fixed'
     const font_size = 30
+    registerFont('microsoft-sans-serif.ttf', {family: 'Regular'})
+    const font = 'Regular'
 
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
     const drawPresence = presence => {
