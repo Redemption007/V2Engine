@@ -161,6 +161,18 @@ const MESSAGES = {
                 Admin: false,
                 Modo: true,
             },
+            RESETXP: {
+                name: "resetxp",
+                category: 'Moderation',
+                aliases: ["resetxp", "rxp"],
+                description: "Remet à zéro l'expérience d'un membre.",
+                cooldown: 5,
+                arg: true,
+                usage: "resetxp <@user ou ID>",
+                isUserModo: false,
+                Admin: true,
+                Modo: false,
+            },
             UNBAN: {
                 name: "unban",
                 category: "Moderation",
@@ -492,7 +504,7 @@ const MESSAGES = {
             XP: {
                 name: "xp",
                 category: 'Utilitaires',
-                aliases: ['xp'],
+                aliases: ['xp', 'rang', 'rank'],
                 description: "Renvoie l'expérience de l'utilisateur",
                 cooldown: 10,
                 arg: false,

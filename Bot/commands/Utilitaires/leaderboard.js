@@ -3,14 +3,21 @@ const {MESSAGES} = require('../../starterpack/constants')
 
 
 module.exports.run = async (client, message) => {
+    const guild = await client.getGuild(message.guild)
     let Page = 0
-    let Utilisateurs = ''
-    let Niveaux = ''
     let position = 1
-    let allUsers;
-
-    allUsers = await client.getUsers(message.guild)
-        .then(async p => allUsers = await p.sort((a, b) => a.xp < b.xp ? 1 : -1))
+    let Utilisateurs
+    let Niveaux
+    const allUsers = guild.leaderboard
+    const afficherPage = async (Page, position) => {
+        Utilisateurs = ''
+        Niveaux = ''
+        await allUsers.splice(10*Page, 10*(Page+1)-1).forEach(e => {
+            Utilisateurs += `${position}- <@${e[0]}> : ${client.arrondir(e[1])} points d'xp\n\n`;
+            Niveaux += `__Niveau :__ ${Math.floor(0.63*Math.log(e[1]))}\n\n`;
+            position += 1;
+        })
+    }
 
     const Nbpages = Math.floor(allUsers.length / 10)+1
     const leaderboard = new MessageEmbed()
@@ -18,11 +25,7 @@ module.exports.run = async (client, message) => {
         .setFooter(`Classement demandé par ${message.author.tag}. Page ${Page+1}/${Nbpages}`)
         .setColor('DARK_RED')
 
-    await allUsers.splice(10*Page, 10*(Page+1)-1).forEach(e => {
-        Utilisateurs += `${position}- <@${e.userID}> : ${e.xp} points d'xp\n\n`;
-        Niveaux += `__Niveau :__ ${e.level}\n\n`;
-        position += 1;
-    })
+    afficherPage(Page, position)
     leaderboard.addField('Utilisateurs', Utilisateurs, true)
     leaderboard.addField('Niveaux', Niveaux, true)
     message.channel.send({embeds: [leaderboard]})
@@ -39,16 +42,7 @@ module.exports.run = async (client, message) => {
                     r.users.remove(r.users.cache.filter(usr => !usr.bot).first().id)
                     Page === 0 ? Page = Nbpages-1 : Page -= 1;
                     position = 1+10*Page
-                    Utilisateurs = ''
-                    Niveaux = ''
-
-                    allUsers = await client.getUsers(message.guild)
-                        .then(async p => allUsers = await p.sort((a, b) => a.xp < b.xp ? 1 : -1))
-                    await allUsers.splice(10*Page, 10*(Page+1)-1).forEach(e => {
-                        Utilisateurs += `${position}- <@${e.userID}> : ${e.xp} points d'xp\n\n`;
-                        Niveaux += `__Niveau :__ ${e.level}\n\n`;
-                        position += 1;
-                    })
+                    afficherPage(Page, position)
                     break
                 case '⏹️':
                     collector.stop()
@@ -57,16 +51,7 @@ module.exports.run = async (client, message) => {
                     r.users.remove(r.users.cache.filter(usr => !usr.bot ).first().id)
                     Page === Nbpages-1 ? Page = 0 : Page += 1;
                     position = 1+10*Page
-                    Utilisateurs = ''
-                    Niveaux = ''
-
-                    allUsers = await client.getUsers(message.guild)
-                        .then(async p => allUsers = await p.sort((a, b) => a.xp < b.xp ? 1 : -1))
-                    await allUsers.splice(10*Page, 10*(Page+1)-1).forEach(e => {
-                        Utilisateurs += `${position}- <@${e.userID}> : ${e.xp} points d'xp\n\n`;
-                        Niveaux += `__Niveau :__ ${e.level}\n\n`;
-                        position += 1;
-                    })
+                    afficherPage(Page, position)
                     break
                 }
                 await lb.edit({embeds: [{

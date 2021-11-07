@@ -16,10 +16,11 @@ module.exports.run = async (client, message, args, settings) => {
 
 
     if (dbUserMentionned.xp[index] === 0) return message.reply({embeds: [{color: 'RED', title: 'AH !', description: `L'utilisateur concerné n'a aucun points d'xp !`}]})
+    if (dbUserMentionned.xp[index]- Math.abs(xp)<0) xp = dbUserMentionned.xp[index]
 
     await client.updateXP(member, message.guild.id, -Math.abs(xp))
 
-    return message.reply({embeds: [{color: 'BLUE', title: 'Supression d\'xp réussie !', description: `Vous avez supprimé ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${dbUserMentionned.xp[index]-xp}`}]})
+    return message.reply({embeds: [{color: 'BLUE', title: 'Supression d\'xp réussie !', description: `Vous avez supprimé ${xp} points d'xp à <@${member.id}>.\nVoici son xp total actuel : ${dbUserMentionned.xp[index]-xp}`}]})
 }
 module.exports.help = MESSAGES.Commandes.Moderation.DELETEXP;
 

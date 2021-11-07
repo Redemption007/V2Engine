@@ -14,27 +14,30 @@ module.exports = async (client, message) => {
             username: message.member.user.tag,
             dmable: true,
             xp: [0],
-            level: [0]
+            level: [0],
+            rang: [message.guild.memberCount]
         })
+        await settings.updateOne({$push: {leaderboard: [[message.member.id, 0]]}})
     } else {
-        let index = await dbUser.guildIDs.indexOf(message.guild.id)
-        if (index == -1) {
-            index = await dbUser.guildIDs.length
-            await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
-        }
-        const xpCooldown = Math.floor(Math.random()*4 +1)
-        const xpToAdd = Math.floor(Math.random()*25 +10)
+        if (message.content.length>3) {
+            let index = await dbUser.guildIDs.indexOf(message.guild.id)
+            if (index == -1) {
+                index = await dbUser.guildIDs.length
+                await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
+            }
+            const xpCooldown = Math.floor(Math.random()*4 +1)
+            const xpToAdd = Math.floor(Math.random()*25 +10)
 
-        if (xpCooldown === 4) await client.updateXP(message.member, message.guild.id, xpToAdd)
+            if (xpCooldown <= 4.3 && xpCooldown >= 3.7) await client.updateXP(message.member, message.guild.id, xpToAdd)
 
-        const userLevel = Math.floor(0.63*Math.log(dbUser.xp[index]))
-
-        if (dbUser.level[index] !== userLevel) {
-            if (dbUser.level[index] < userLevel) message.reply(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`).catch(() => message.channel.send(`Bravo champion, tu viens d'atteindre le niveau **${userLevel}** ! Pourras-tu faire Top 1 ?`))
-            if (dbUser.level[index] > Math.max(userLevel, 0)) message.reply(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`).catch(() => message.channel.send(`Oh non ! Ton xp a été descendue à ${dbUser.xp[index]} et tu es donc descendu au niveau ${userLevel} !`))
-            let userLevels = dbUser.level
-            userLevels[index]=userLevel
-            client.updateUser(message.member, {level: userLevels})
+            const userLevel = Math.floor(0.63*Math.log(dbUser.xp[index]))
+            if (dbUser.level[index] !== userLevel) {
+                if (dbUser.level[index] < userLevel && settings.nextLevelMessage.length) message.reply(await client.replaced(message, settings.nextLevelMessage)).catch(async () => message.channel.send(await client.replaced(message, settings.nextLevelMessage)))
+                if (dbUser.level[index] > Math.max(userLevel, 0)) message.reply(`Oh non ! Ton expérience a été descendue et tu es donc revenu au niveau ${userLevel} !`).catch(() => message.channel.send(`Oh non ! Ton expérience a été descendue et tu es donc revenu au niveau ${userLevel} !`))
+                let userLevels = dbUser.level
+                userLevels[index]=userLevel
+                client.updateUser(message.member, {level: userLevels})
+            }
         }
     }
 

@@ -7,7 +7,9 @@ module.exports = async (client, MessageReaction, user) => {
     const member = MessageReaction.message.guild.members.cache.get(user.id)
     const emojiName = MessageReaction.emoji.name
     const dbUser = await client.getUser(user)
-    let DMable = dbUser.dmable
+    let DMable
+    if (dbUser) DMable = dbUser.dmable
+    else DMable = true
     const messageReactor = await client.getReactor({id: MessageReaction.message.id})
 
     if (!messageReactor) return

@@ -43,5 +43,6 @@ module.exports = client => {
         xp[index] += XP
 
         await client.updateUser(member, {xp: xp})
+        return client.updateLeaderboard(member, xp[index])
     }
 }

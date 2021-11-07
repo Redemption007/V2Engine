@@ -61,4 +61,23 @@ module.exports = client => {
 
         return guild.save()
     }
+
+    client.updateLeaderboard = async (member, xp) => {
+        const guild = await client.getGuild(member.guild)
+        let lb = guild.leaderboard
+        const exchange = i => {
+            const placeholder = lb[i]
+            lb[i] = lb[i-1]
+            lb[i-1] = placeholder
+            return lb
+        }
+        const index = lb.findIndex(rang => rang[0]===member.id)
+        if (!lb.length || index==-1) return guild.updateOne({$push: {leaderboard: [[member.id, xp]]}})
+        lb[index][1]=xp
+        if (lb.length>1) {
+            if (lb[index-1][1]<=lb[index][1]) exchange(index)
+            if (lb[index+1][1]>=lb[index][1]) exchange(index+1)
+        }
+        return guild.updateOne({leaderboard: lb})
+    }
 }

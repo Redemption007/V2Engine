@@ -120,4 +120,34 @@ module.exports = client => {
             "Cette catégorie regroupe les commandes servant à améliorer la vie du serveur. Jeux, informations utiles, raccourcis, vous y trouverez de tout !"
         }
     }
+
+    client.arrondir = nombre => {
+        let tronque
+        if ((''+nombre).length>9) {
+            tronque = Math.trunc(nombre*0.000001)
+            return tronque*0.001+'G'
+        }
+        if ((''+nombre).length>6) {
+            tronque = Math.trunc(nombre*0.0001)
+            return tronque*0.01+'M'
+        }
+        if ((''+nombre).length>4) {
+            tronque = Math.trunc(nombre*0.01)
+            return tronque*0.1+'K'
+        }
+        return nombre
+    }
+
+    client.replaced = async (message, string) => {
+        const guild = await client.getGuild(message.guild)
+        const dbUser = await client.getUser(message.member)
+        const index = await dbUser.guildIDs.indexOf(message.guild.id)
+        const level = Math.floor(0.63*Math.log(dbUser.xp[index]))
+        const rang = guild.leaderboard.findIndex(rang => rang[0]===message.member.id)
+        const xp_restante = Math.floor(dbUser.xp[index] - Math.exp(level/0.63))
+        const pallier = Math.floor(Math.exp((level+1)/0.63))-Math.floor(Math.exp(level/0.63))
+
+        const final_string = string.replace(/{{userlevel}}/gi, level).replace(/{{rang}}/gi, rang).replace(/{{xp_restante}}/gi, client.arrondir(xp_restante)).replace(/{{pallier}}/gi, client.arrondir(pallier)).replace(/{{user}}/gi, message.author).replace(/{{usertag}}/gi, message.author.tag).replace(/{{nickname}}/gi, message.member.nickname?message.member.nickname:message.author.username).replace(/{{servername}}/gi, message.guild.name)
+        return final_string
+    }
 }
