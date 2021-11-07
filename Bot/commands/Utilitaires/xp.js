@@ -21,9 +21,11 @@ module.exports.run = async (client, message, args, settings) => {
     const x_presence = x_arc+rayon/Math.sqrt(2)
     const y_presence = y_arc+rayon/Math.sqrt(2)
     //Canvas et contexte
+    const guild = await client.getGuild(message.guild)
+    const image = guild.rankImage
     const canvas = createCanvas(x_tot, y_tot)
     const ctx = canvas.getContext('2d')
-    const background = await loadImage('https://cdn.discordapp.com/attachments/906726350323335189/906726565566627900/screen_mc.png')
+    const background = await loadImage(image)
     const font_size = 30
     registerFont('microsoft-sans-serif.ttf', {family: 'Regular'})
     const font = 'Regular'

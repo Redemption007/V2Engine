@@ -17,6 +17,14 @@ const guildSchema = mongoose.Schema({
         "type": String,
         "default": 'none'
     },
+    rankImage: {                                                  //Image de rang
+        "type": String,
+        "default": "https://cdn.discordapp.com/attachments/906726350323335189/906726565566627900/screen_mc.png"
+    },
+    welcomeImage: {                                               //Image de bienvenue
+        "type": String,
+        "default": "https://cdn.discordapp.com/attachments/906726350323335189/906944806616453130/welcome.jpg"
+    },
     welcomeMessage: {                                             //Message de bienvenue
         "type": String,
         "default": 'none'
