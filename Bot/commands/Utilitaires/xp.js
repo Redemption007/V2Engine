@@ -24,7 +24,7 @@ module.exports.run = async (client, message, args, settings) => {
     //Canvas et contexte
     const canvas = createCanvas(x_tot, y_tot)
     const ctx = canvas.getContext('2d')
-    const background = await loadImage('screen mc.png')
+    const background = await loadImage('https://cdn.discordapp.com/attachments/906726350323335189/906726565566627900/screen_mc.png')
     const font_size = 30
 
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
@@ -132,6 +132,7 @@ module.exports.run = async (client, message, args, settings) => {
     const rang = settings.leaderboard.findIndex(rang => rang[0]===member.id)+1
     const xp_restante = Math.floor(dbUser.xp[index] - Math.exp(level/0.63))
     const pallier = Math.floor(Math.exp((level+1)/0.63))-Math.floor(Math.exp(level/0.63))
+    //Images
     let avatar
     try {
         avatar = await loadImage(member.displayAvatarURL({format: 'jpg'}))
