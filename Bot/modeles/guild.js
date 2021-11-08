@@ -37,12 +37,17 @@ const guildSchema = mongoose.Schema({
         "type": String,
         "default": 'none'
     },
+    animationrole: {
+        "type": String,
+        "default": 'none'
+    },
     muteRole: {                                                   //Rôle Mute du serveur
         "type": String,
         "default": 'none'
     },
     Banned: Array,                                                //Utilisateurs bannis des tournois
-    leaderboard: Array                                            //Classement des xp du serveur : [[user1, xp1], [user2, xp2], etc]
+    leaderboard: Array,                                           //Classement des xp du serveur : [[user1, xp1], [user2, xp2], etc]
+    roles: Array                                                  //Rôles données pour des animations
 })
 
 module.exports = mongoose.model('Guild', guildSchema);

@@ -67,11 +67,11 @@ const MESSAGES = {
                 Admin: false,
                 Modo: true,
                 Animation: true
-            },
+            }/*,
             ADDROLE: {},
             DELETEROLE: {},
             ADDTIMER: {},
-            DELETETIMER: {}
+            DELETETIMER: {}*/
         },
         Helper: {
             HELP: {

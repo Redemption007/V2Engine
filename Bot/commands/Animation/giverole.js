@@ -16,7 +16,7 @@ module.exports.run = async (client, message, args, settings) => {
     const msg = await message.reply('Voulez-vous que le rôle s\'enlève au bout d\'un laps de temps ?')
     msg.react('✅')
     msg.react('❌')
-    const answer = await msg.awaitReactions({filterReaction, time: 10000})
+    const answer = await msg.awaitReactions({filter: filterReaction, time: 10000})
     if (!answer.size || answer.first()._emoji.name === '❌') {
         msg.reactions.removeAll()
         await member.roles.add(role_to_give)
@@ -24,7 +24,7 @@ module.exports.run = async (client, message, args, settings) => {
     }
     msg.reactions.removeAll()
     const mesge = await msg.reply(`<@${message.author.id}>, merci d'indiquer le temps pendant lequel le membre aura le rôle ajouté :`)
-    const time = await message.channel.awaitMessages({filterMsg, time: 20000})
+    const time = await message.channel.awaitMessages({filter: filterMsg, time: 20000})
     if (!time.size) {
         await member.roles.add(role_to_give)
         await mesge.delete()
@@ -40,4 +40,4 @@ module.exports.run = async (client, message, args, settings) => {
     await time.first().delete()
     msg.edit('Le rôle a correctement été ajouté. Il sera enlevé dans '+ms(time_ms, true))
 }
-module.exports.help = MESSAGES.Commandes.Moderation.GIVEROLE;
+module.exports.help = MESSAGES.Commandes.Animation.GIVEROLE;
