@@ -69,7 +69,6 @@ module.exports = client => {
             const placeholder = lb[i]
             lb[i] = lb[i-1]
             lb[i-1] = placeholder
-            console.log('Places échangées !');
             return lb
         }
         const index = lb.findIndex(rang => rang[0]===member.id)

@@ -1,4 +1,5 @@
 const {MESSAGES} = require("../../starterpack/constants");
+const {MessageAttachment} = require('discord.js')
 
 module.exports.run = async (client, message, args, settings) => {
     const getSetting = args[0].toLowerCase();
@@ -8,8 +9,6 @@ module.exports.run = async (client, message, args, settings) => {
     switch (getSetting) {
 
 
-    case 'generalChannel':
-    case 'généralChannel':
     case 'généralchannel':
     case 'generalchannel': {
         if (newSetting) {
@@ -68,6 +67,15 @@ module.exports.run = async (client, message, args, settings) => {
         return message.channel.send({embeds: [{color: 'ORANGE', description: ` Rôle Mute actuel : <@&${settings.muterole}>`}]})
     }
 
+    case 'nextlevelmessage':
+        if (newSetting) {
+            await client.updateGuild(message.guild, {nextLevelMessage: newSetting});
+
+            return message.channel.send({embeds: [{color: 'GOLD', title: 'Message de niveau supérieur mis à jour :', description: `\`${settings.nextLevelMessage}\` est remplacé par \`${newSetting}\``}]})
+        }
+
+        return message.channel.send({embeds: [{color: 'ORANGE', description: `Message de niveau supérieur actuel : \`${settings.nextLevelMessage}\``}]})
+
     case 'préfixe':
     case 'prefixe':
     case 'préfix':
@@ -81,6 +89,23 @@ module.exports.run = async (client, message, args, settings) => {
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: `Préfixe actuel : \`${settings.prefix}\``}]})
     }
+
+    case 'rankimage':
+    case 'rangimage':
+    case 'xpimage':
+        if (newSetting) {
+            if (!message.content.match(/^https?::\/\/.+(\.(png)|(jpg)|(jpeg))$/)) {
+                if (!message.attchments.size) return message.reply('Merci de prodiguer une réponse valable : une image ou un lien d\'image.')
+                const image_channel = await client.channels.fetch(client.config.IMAGE_CHANNEL)
+                image_channel.send({files: message.attchments.first()})
+                    .then(msg => newSetting = msg.attchments.first().url)
+            }
+            await message.delete()
+            await client.updateGuild(message.guild, {rankImage: newSetting});
+            return message.channel.send({embeds: [{color: 'ORANGE', description: `Image d'xp mise à jour avec succès ! Voici la nouvelle image :`}], files: new MessageAttachment(newSetting)})
+        }
+        return message.channel.send({embeds: [{color: 'ORANGE', description: `Image actuelle :`}], files: new MessageAttachment(settings.rankImage)})
+
 
     case 'staffrole': {
         if (newSetting) {
@@ -100,6 +125,20 @@ module.exports.run = async (client, message, args, settings) => {
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: ` Rôle de staff actuel : <@&${settings.staffrole}>`}]})
     }
+
+    case 'welcomeimage':
+        if (newSetting) {
+            if (!message.content.match(/^https?::\/\/.+(\.(png)|(jpg)|(jpeg))$/)) {
+                if (!message.attchments.size) return message.reply('Merci de prodiguer une réponse valable : une image ou un lien d\'image.')
+                const image_channel = await client.channels.fetch(client.config.IMAGE_CHANNEL)
+                image_channel.send({files: message.attchments.first()})
+                    .then(msg => newSetting = msg.attchments.first().url)
+            }
+            await message.delete()
+            await client.updateGuild(message.guild, {welcomeImage: newSetting});
+            return message.channel.send({embeds: [{color: 'ORANGE', description: `Image de bienvenue mise à jour avec succès ! Voici la nouvelle image :`}], files: new MessageAttachment(newSetting)})
+        }
+        return message.channel.send({embeds: [{color: 'ORANGE', description: `Image de bienvenue actuelle :`}], files: new MessageAttachment(settings.rankImage)})
 
     case 'welcomemessage': {
         if (newSetting) {

@@ -1,8 +1,9 @@
+/* eslint-disable no-multi-spaces */
 const {MESSAGES} = require('../../starterpack/constants')
 const {createCanvas, loadImage, registerFont} = require('canvas')
 const {MessageAttachment} = require('discord.js')
 
-module.exports.run = async (client, message, args, settings) => {
+module.exports.run = async (client, message, args) => {
     //Couleurs
     const gris = "#797979"
     const gris_clair = '#767E8D'
@@ -101,23 +102,39 @@ module.exports.run = async (client, message, args, settings) => {
 
     let dbUser
     let member
+    let content = ''
 
     if (message.mentions.members.first()) {
         member = message.mentions.members.first();
         dbUser = await client.getUser(member)
         if (!dbUser) return message.reply(message.mentions.members.first()+' n\'a encore jamais parlé ! Invite-le à parler en entamant une discussion ou un jeu avec lui :wink:')
     } else {
-        if (args.length) {
-            if (!isNaN(+args[0])) {
+        if (args.length) {                                                        //S'il y a des arguments autre qu'une mention :
+            if (args[0].match(/[0-9]{18}/)) {                                     // Recherche par id
                 member = await message.guild.members.fetch(args[0])
                 dbUser = await client.getUser({id: args[0]})
                 if (!dbUser) {
                     if (member) return message.reply(`L'utilisateur d'ID ${args[0]} n'a encore jamais parlé ! Invite-le à parler en entamant une discussion ou un jeu avec lui :wink:`)
                     return message.reply(`L'utilisateur d'ID ${args[0]} n'existe pas ! Vérifie l'identifiant que tu as écris.`)
                 }
-                if (dbUser && !member) message.reply('Cet utilisateur n\'est plus dans la guilde ! Il n\'évolue donc plus en expérience jusqu\'à son retour ! Pour le supprimer, il vous suffit de remettre son xp à 0 !')
+                if (dbUser && !member) content += ':warning: Cet utilisateur n\'est plus dans la guilde ! Il n\'évolue donc plus en expérience jusqu\'à son retour ! Pour le supprimer, il vous suffit de reset son xp ! :warning:'
+            } else {
+                if (args[0].startsWith('#')) {                                    // Recherche par rang
+                    let rank = args[0].split('#').join('')
+                    if (rank>guild.leaderboard.length) {
+                        content +=`:warning: Le rang indiqué est trop grand ! Le dernier rang du classement est rang #${guild.leaderboard.length} et voici sa carte d'expérience :warning:`
+                        rank = guild.leaderboard.length
+                    }
+                    const member_id = guild.leaderboard[rank-1][0]
+                    dbUser = await client.getUser({id: member_id})
+                    member = await message.guild.members.fetch(member_id)
+                    if (dbUser && !member) {
+                        member = {id: member_id, presence: {status: 'offline'}, user: {tag: dbUser.username}}
+                        content += ':warning: Cet utilisateur n\'est plus dans la guilde ! Il n\'évolue donc plus en expérience jusqu\'à son retour ! Pour le supprimer, il vous suffit de reset son xp ! :warning:'
+                    }
+                }
             }
-        } else {
+        } else {                                                                   //S'il n'y a pas d'arguments :
             member = message.member;
             dbUser = await client.getUser(member)
             if (!dbUser) return message.reply('Tu n\'a encore jamais parlé ! Entamant une discussion ou un jeu avec d\'autres membres pour gagner de l\'xp :wink:')
@@ -132,15 +149,19 @@ module.exports.run = async (client, message, args, settings) => {
     if (tag[0].length>=15 && tag[0].length<=20) i = 10
     if (tag[0].length<=10) i = 0
     const level = Math.floor(0.63*Math.log(dbUser.xp[index]))
-    const rang = settings.leaderboard.findIndex(rang => rang[0]===member.id)+1
+    const rang = guild.leaderboard.findIndex(rang => rang[0]===member.id)+1
     const xp_restante = Math.floor(dbUser.xp[index] - Math.exp(level/0.63))
     const pallier = Math.floor(Math.exp((level+1)/0.63))-Math.floor(Math.exp(level/0.63))
     //Images
     let avatar
-    try {
+    try {                                                                                     //Avatar de membre
         avatar = await loadImage(member.displayAvatarURL({format: 'jpg'}))
-    } catch {
-        avatar = await loadImage(member.user.displayAvatarURL({format: 'jpg'}))
+    } catch {                                                                                 //Si pas d'avatar de membre
+        try {                                                                                 //Avatar d'utilisateur
+            avatar = await loadImage(member.user.displayAvatarURL({format: 'jpg'}))
+        } catch {                                                                             //Avatar classique Discord
+            avatar = await loadImage('https://cdn.discordapp.com/attachments/906726350323335189/906968817282973696/idle.png')
+        }
     }
     //Positions
     ctx.font = `${font_size}px ${font}`
@@ -222,6 +243,6 @@ module.exports.run = async (client, message, args, settings) => {
 
     const attachment = new MessageAttachment(canvas.toBuffer(), "rang.png")
 
-    return message.channel.send({files: [attachment]})
+    return message.channel.send({content: content, files: [attachment]})
 }
 module.exports.help = MESSAGES.Commandes.Utilitaires.XP;
