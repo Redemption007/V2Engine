@@ -107,14 +107,14 @@ module.exports.run = async (client, message, args) => {
     if (message.mentions.members.first()) {
         member = message.mentions.members.first();
         dbUser = await client.getUser(member)
-        if (!dbUser) return message.reply(message.mentions.members.first()+' n\'a encore jamais parlé ! Invite-le à parler en entamant une discussion ou un jeu avec lui :wink:')
+        if (!dbUser) return message.reply(`${message.mentions.members.first()} n'a encore jamais parlé ! Invite-le à parler en entamant une discussion ou un jeu avec lui :wink:`)
     } else {
         if (args.length) {                                                        //S'il y a des arguments autre qu'une mention :
             if (args[0].match(/[0-9]{18}/)) {                                     // Recherche par id
                 member = await message.guild.members.fetch(args[0])
                 dbUser = await client.getUser({id: args[0]})
                 if (!dbUser) {
-                    if (member) return message.reply(`L'utilisateur d'ID ${args[0]} n'a encore jamais parlé ! Invite-le à parler en entamant une discussion ou un jeu avec lui :wink:`)
+                    if (member) return message.reply(`L'utilisateur d'ID ${args[0]} (${member.nickname||member.user.tag}) n'a encore jamais parlé ! Invite-le à parler en entamant une discussion ou un jeu avec lui :wink:`)
                     return message.reply(`L'utilisateur d'ID ${args[0]} n'existe pas ! Vérifie l'identifiant que tu as écris.`)
                 }
                 if (dbUser && !member) content += ':warning: Cet utilisateur n\'est plus dans la guilde ! Il n\'évolue donc plus en expérience jusqu\'à son retour ! Pour le supprimer, il vous suffit de reset son xp ! :warning:'
@@ -122,7 +122,7 @@ module.exports.run = async (client, message, args) => {
                 if (args[0].startsWith('#')) {                                    // Recherche par rang
                     let rank = args[0].split('#').join('')
                     if (rank>guild.leaderboard.length) {
-                        content +=`:warning: Le rang indiqué est trop grand ! Le dernier rang du classement est rang #${guild.leaderboard.length} et voici sa carte d'expérience :warning:`
+                        content +=`:warning: Le rang indiqué est trop grand ! Le dernier rang du classement est rang **#${guild.leaderboard.length}** et voici sa carte d'expérience :warning:`
                         rank = guild.leaderboard.length
                     }
                     const member_id = guild.leaderboard[rank-1][0]
@@ -143,11 +143,14 @@ module.exports.run = async (client, message, args) => {
 
     //Données Utilisateur
     const index = await dbUser.guildIDs.indexOf(message.guild.id)
-    const tag = member.user.tag.split('#')
+    if (index === -1) return message.reply(`L'utilisateur ${member.user} n'a encore jamais parlé ! Invite-le à parler en entamant une discussion ou un jeu avec lui :wink:`)
+    let tag = member.user.tag.split('#')
     let i=5
-    if (tag[0].length>20) i = 15
-    if (tag[0].length>=15 && tag[0].length<=20) i = 10
+    if (member.nickname) tag[0] = member.nickname
     if (tag[0].length<=10) i = 0
+    if (tag[0].length>=15 && tag[0].length<=20) i = 10
+    if (tag[0].length>20) i = 15
+    if (tag[0].length>30) i = 17
     const level = Math.floor(0.63*Math.log(dbUser.xp[index]))
     const rang = guild.leaderboard.findIndex(rang => rang[0]===member.id)+1
     const xp_restante = Math.floor(dbUser.xp[index] - Math.exp(level/0.63))
@@ -166,7 +169,7 @@ module.exports.run = async (client, message, args) => {
     //Positions
     ctx.font = `${font_size}px ${font}`
     const y_discriminator = y_arc-rayon+40
-    const x_discriminator = Math.min(x_arc+rayon+5+ctx.measureText(tag[0]).width, 375)
+    const x_discriminator = Math.min(x_arc+rayon+5+ctx.measureText(tag[0]).width, 400)
 
     //Barre de progression totale :
     ctx.globalAlpha = 0.5;
@@ -242,6 +245,8 @@ module.exports.run = async (client, message, args) => {
     drawPresence(member.presence)
 
     const attachment = new MessageAttachment(canvas.toBuffer(), "rang.png")
+
+    if (!content) content = null
 
     return message.channel.send({content: content, files: [attachment]})
 }
