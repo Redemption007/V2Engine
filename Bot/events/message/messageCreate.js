@@ -31,7 +31,7 @@ ERREUR lors de la suppression du message de la commande :\n\n' + err+'\n\
         })
         await settings.updateOne({$push: {leaderboard: [[message.member.id, 0]]}})
     } else {
-        if (message.content.length>3) {
+        if (message.content.length>3 && !message.content.startsWith(settings.prefix)) {
             let index = await dbUser.guildIDs.indexOf(message.guild.id)
             if (index == -1) {
                 index = await dbUser.guildIDs.length
