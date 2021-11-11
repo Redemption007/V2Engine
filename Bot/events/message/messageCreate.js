@@ -3,7 +3,7 @@ const discord = require('discord.js')
 module.exports = async (client, message) => {
 
     if (message.author.bot) return;
-    if (message.content.startsWith(';') && message.guild.id === client.config.MAINGUILDID && `<@${client.user.id}>`===client.config.NAME) return
+    if (message.content.startsWith(';') && message.guild.id === '776429325838319616' && `<@${client.user.id}>`===client.config.NAME) return
     //Cette ligne évite au bot de répondre sur le serveur de test, quand on attend seulement une réponse du bot test, lancé avec le même code.
 
     if (message.channel.type === 'DM') return client.emit('DM', message);
@@ -14,7 +14,9 @@ module.exports = async (client, message) => {
     const deleteWithoutError = () => {
         if (Chan.deleted && Chan.id === settings.generalChannel) return client.getGeneralChannel(_guild)
         if (message.deleted) return
-        message.delete().catch(err => console.log('-----------------------------------------------------\nERREUR lors de la suppression du message de la commande :\n\n' + err+'\n-----------------------------------------------------'))
+        message.delete().catch(err => console.log('-----------------------------------------------------\n\
+ERREUR lors de la suppression du message de la commande :\n\n' + err+'\n\
+-----------------------------------------------------'))
     }
 
     if (!dbUser) {
