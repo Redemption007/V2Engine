@@ -13,7 +13,7 @@ module.exports.run = async (client, message) => {
     const afficherPage = (MESSAGE, PAGE, POSITION) => {
         Utilisateurs = ''
         Niveaux = ''
-        for (let i=nbr_par_page*PAGE; i<nbr_par_page*(PAGE+1); i++) {
+        for (let i=nbr_par_page*PAGE; i<Math.min(allUsers.length, nbr_par_page*(PAGE+1)); i++) {
             Utilisateurs += `${POSITION}- <@${allUsers[i][0]}> : ${client.arrondir(allUsers[i][1])} points d'xp\n\n`;
             Niveaux += `__Niveau :__ ${Math.floor(0.63*Math.log(allUsers[i][1]))}\n\n`;
             POSITION += 1;
