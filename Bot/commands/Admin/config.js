@@ -8,9 +8,23 @@ module.exports.run = async (client, message, args, settings) => {
 
     switch (getSetting) {
 
+    case 'animationrole':
+    case 'animationrôle':
+        if (newSetting) {
+            if (message.mentions.roles.size) newSetting = message.mentions.roles.first().id
+            else {
+                const role = await message.guild.roles.fetch(newSetting)
+                if (!role) return message.reply(`"${newSetting}" n'est pas une réponse valable ! Merci d'indiquer un rôle valide en écrivant son ID ou en le taguant comme suit : \`<@&id>\` ou bien \`@nom\` .`)
+            }
+            await client.updateGuild(message.guild, {staffrole: newSetting});
+
+            return message.channel.send({embeds: [{color: 'GOLD', title: 'Rôle d\'animation mis à jour :', description: `<@&${settings.animationrole}> est remplacé par <@&${newSetting}>`}]})
+        }
+
+        return message.channel.send({embeds: [{color: 'ORANGE', description: ` Rôle d'animation actuel : <@&${settings.animationrole}>`}]})
 
     case 'généralchannel':
-    case 'generalchannel': {
+    case 'generalchannel':
         if (newSetting) {
             if (message.mentions.channels.size) newSetting = message.mentions.channels.first().id
             else {
@@ -27,9 +41,8 @@ module.exports.run = async (client, message, args, settings) => {
         }
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: `Channel général actuel : <#${settings.generalChannel}>`}]})
-    }
 
-    case 'logchannel': {
+    case 'logchannel': 
         if (newSetting) {
             if (message.mentions.channels.size) newSetting = message.mentions.channels.first().id
             else {
@@ -46,9 +59,8 @@ module.exports.run = async (client, message, args, settings) => {
         }
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: `Channel de logs actuel : <#${settings.logChannel}>`}]})
-    }
 
-    case 'muterole': {
+    case 'muterole':
         if (newSetting) {
             if (message.mentions.roles.size) newSetting = message.mentions.roles.first().id
             else {
@@ -58,14 +70,13 @@ module.exports.run = async (client, message, args, settings) => {
                     })
                     .catch(() => error=1)
             }
-            if (error) return message.reply(`"${newSetting}" n'est pas une réponse valable ! Merci d'indiquer un rôle valide en écrivant son ID ou en le taguant comme suit : \`<@!id>\` ou bien \`@nom\` . Ce rôle ne doit pas avoir la permission de parler.`)
+            if (error) return message.reply(`"${newSetting}" n'est pas une réponse valable ! Merci d'indiquer un rôle valide en écrivant son ID ou en le taguant comme suit : \`<@&id>\` ou bien \`@nom\` . Ce rôle ne doit pas avoir la permission de parler.`)
             await client.updateGuild(message.guild, {muterole: newSetting});
 
             return message.channel.send({embeds: [{color: 'GOLD', title: 'Rôle Mute mis à jour :', description: `<@&${settings.muterole}> est remplacé par <@&${newSetting}>`}]})
         }
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: ` Rôle Mute actuel : <@&${settings.muterole}>`}]})
-    }
 
     case 'nextlevelmessage':
         if (newSetting) {
@@ -79,7 +90,7 @@ module.exports.run = async (client, message, args, settings) => {
     case 'préfixe':
     case 'prefixe':
     case 'préfix':
-    case 'prefix': {
+    case 'prefix':
         if (newSetting) {
             await message.delete()
             await client.updateGuild(message.guild, {prefix: newSetting});
@@ -88,7 +99,6 @@ module.exports.run = async (client, message, args, settings) => {
         }
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: `Préfixe actuel : \`${settings.prefix}\``}]})
-    }
 
     case 'rankimage':
     case 'rangimage':
@@ -107,7 +117,7 @@ module.exports.run = async (client, message, args, settings) => {
         return message.channel.send({embeds: [{color: 'ORANGE', description: `Image actuelle :`}], files: new MessageAttachment(settings.rankImage)})
 
 
-    case 'staffrole': {
+    case 'staffrole':
         if (newSetting) {
             if (message.mentions.roles.size) newSetting = message.mentions.roles.first().id
             else {
@@ -117,14 +127,13 @@ module.exports.run = async (client, message, args, settings) => {
                     })
                     .catch(() => error=1)
             }
-            if (error) return message.reply(`"${newSetting}" n'est pas une réponse valable ! Merci d'indiquer un rôle valide en écrivant son ID ou en le taguant comme suit : \`<@!id>\` ou bien \`@nom\` . Ce rôle doit au moins avoir la permissions de kick les membres.`)
+            if (error) return message.reply(`"${newSetting}" n'est pas une réponse valable ! Merci d'indiquer un rôle valide en écrivant son ID ou en le taguant comme suit : \`<@&id>\` ou bien \`@nom\` . Ce rôle doit au moins avoir la permissions de kick les membres.`)
             await client.updateGuild(message.guild, {staffrole: newSetting});
 
             return message.channel.send({embeds: [{color: 'GOLD', title: 'Rôle de staff mis à jour :', description: `<@&${settings.staffrole}> est remplacé par <@&${newSetting}>`}]})
         }
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: ` Rôle de staff actuel : <@&${settings.staffrole}>`}]})
-    }
 
     case 'welcomeimage':
         if (newSetting) {
@@ -140,7 +149,7 @@ module.exports.run = async (client, message, args, settings) => {
         }
         return message.channel.send({embeds: [{color: 'ORANGE', description: `Image de bienvenue actuelle :`}], files: new MessageAttachment(settings.rankImage)})
 
-    case 'welcomemessage': {
+    case 'welcomemessage':
         if (newSetting) {
             await client.updateGuild(message.guild, {welcomeMessage: newSetting});
 
@@ -148,7 +157,6 @@ module.exports.run = async (client, message, args, settings) => {
         }
 
         return message.channel.send({embeds: [{color: 'ORANGE', description: `Message de bienvenue actuel : \`${settings.welcomeMessage}\``}]})
-    }
 
     default: return message.channel.send({embeds: [{color: 'RED', description: ` Votre paramètre (${args[0]}) n'est pas valide.`}]})
     }

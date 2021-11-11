@@ -3,9 +3,19 @@ const discord = require('discord.js')
 module.exports = async (client, message) => {
 
     if (message.author.bot) return;
+    if (message.content.startsWith(';') && message.guild.id === client.config.MAINGUILDID && `<@${client.user.id}>`===client.config.NAME) return
+    //Cette ligne évite au bot de répondre sur le serveur de test, quand on attend seulement une réponse du bot test, lancé avec le même code.
+
     if (message.channel.type === 'DM') return client.emit('DM', message);
     const settings = await client.getGuild(message.guild)
     let dbUser = await client.getUser(message.member)
+    const Chan = message.channel
+    const _guild = message.guild
+    const deleteWithoutError = () => {
+        if (Chan.deleted && Chan.id === settings.generalChannel) return client.getGeneralChannel(_guild)
+        if (message.deleted) return
+        message.delete().catch(err => console.log('-----------------------------------------------------\nERREUR lors de la suppression du message de la commande :\n\n' + err+'\n-----------------------------------------------------'))
+    }
 
     if (!dbUser) {
         await client.createUser({
@@ -57,19 +67,23 @@ module.exports = async (client, message) => {
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.help.aliases && cmd.help.aliases.includes(commandName));
 
     if (!command) {
-        setTimeout(() => message.delete().catch(), 5000)
+        setTimeout(() => {
+            return deleteWithoutError()
+        }, 5000)
         return message.reply({embeds: [{color: 'RED', title: 'Oups !', description: "La commande demandée est inexistante..."}]})
     }
 
     try {
         if (command.help.isUserModo && message.mentions.users.first().id === client.user.id) return message.reply("Attends, t'as vraiment essayé de me troll là ?")
-        if (command.help.Modo && !message.member.permissions.has('KICK_MEMBERS')||command.help.Admin && !message.member.permissions.has('ADMINISTRATOR')) {
+        if (command.help.Modo && !message.member.permissions.has('KICK_MEMBERS')||command.help.Admin && !message.member.permissions.has('ADMINISTRATOR')||command.help.Animation && !message.member.permissions.has('ADMINISTRATOR') && !message.member.roles.cache.has(settings.animationrole)) {
             const nope = new discord.MessageEmbed()
                 .setTitle("Hélas !")
                 .setColor("BLACK")
                 .setTimestamp()
                 .setDescription(`<@${message.author.id}>, tu n'as pas les permissions nécessaires pour éxécuter cette commande !`)
-            setTimeout(() => message.delete().catch(), 5000)
+            setTimeout(() => {
+                return deleteWithoutError()
+            }, 5000)
             return message.channel.send({embeds: [nope]});
         }
 
@@ -79,7 +93,9 @@ module.exports = async (client, message) => {
                 .setColor("BLACK")
                 .setTimestamp()
                 .setDescription(`<@${message.author.id}>, tu ne peux pas éxécuter la commande ${command.help.name} sur un modérateur !`);
-            setTimeout(() => message.delete().catch(), 5000)
+            setTimeout(() => {
+                return deleteWithoutError()
+            }, 5000)
             return message.channel.send({embeds: [nope]});
         }
 
@@ -89,7 +105,10 @@ module.exports = async (client, message) => {
             .setColor("BLACK")
             .setTimestamp()
             .setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
-        setTimeout(() => message.delete().catch(), 5000)
+        setTimeout(() => {
+            if (message.deleted) return
+            message.delete().catch(err => console.log('-----------------------------------------------------\nERREUR lors de la suppression du message de la commande :\n\n' + err+'\n-----------------------------------------------------'))
+        }, 5000)
         return message.channel.send({embeds: [nope]});
     }
 
@@ -99,7 +118,9 @@ module.exports = async (client, message) => {
         if (command.help.usage) {
             noArgsReply += `\nVoici comment utiliser la commande :\`${settings.prefix}${command.help.usage}\``
         }
-        setTimeout(() => message.delete().catch(), 5000)
+        setTimeout(() => {
+            return deleteWithoutError()
+        }, 5000)
         return message.channel.send(noArgsReply);
     }
 
@@ -118,20 +139,18 @@ module.exports = async (client, message) => {
             let plural = 'seconde'
 
             if (timeLeft.toFixed(0)>1) plural+='s';
-            setTimeout(() => message.delete().catch(), 5000)
+            setTimeout(() => {
+                return deleteWithoutError()
+            }, 5000)
             return message.reply(`Merci d'attendre ${timeLeft.toFixed(0)} ${plural} avant de ré-utiliser la commande \`${settings.prefix}${command.help.name}\`.`);
         }
     }
     tStamps.set(message.author.id, timeNow);
     setTimeout(() => tStamps.delete(message.author.id), cdAmount);
 
-    const Chan = message.channel
-    const _guild = message.guild
     dbUser = await client.getUser(message.member)
     await command.run(client, message, args, settings, dbUser);
-    setTimeout(() => message.delete().catch(async () => {
-        if (Chan.deleted) {
-            if (Chan.id === settings.generalChannel) await client.getGeneralChannel(_guild)
-        }
-    }), 2000)
+    setTimeout(() => {
+        return deleteWithoutError()
+    }, 2000)
 }

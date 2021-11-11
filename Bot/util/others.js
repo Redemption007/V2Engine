@@ -101,6 +101,9 @@ module.exports = client => {
         switch (category) {
         case 'admin':
             return "Cette catégorie est réservée aux administrateurs du serveur. Elle regroupe toutes les commandes pour paramétrer le bot sur le serveur."
+        case 'animation':
+        case 'animations':
+            return "Cette catégorie est réservée aux animateurs. Elle regroupe toutes les commandes exécutables par ceux-ci et tous les outils nécessaires pour accompagner les animations correctement. Enjoy !"
         case 'helper':
             return "Cette catégorie sert à vous aider et à vous orienter parmi les commandes du bot. Faites :\n- `help` pour obtenir la liste de toutes les catégories.\n- `help <categorie>` pour obtenir la liste des commandes pour une catégorie donnée.\n- `help <commande>` pour obtenir des informations sur une commande donnée."
         case 'moderation':

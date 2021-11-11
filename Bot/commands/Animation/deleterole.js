@@ -12,19 +12,19 @@ module.exports.run = async (client, message, args) => {
         role = message.mentions.roles.first()
     }
     const index_role = guild.roles.indexOf(role.id)
-    if (!index_role) return message.reply('Ce rôle n\'est pas dans les rôles d\'animation !')
-    const msg = await message.reply(`Êtes-vous sûr de supprimer le rôle ${role} aux rôles d'animations ? Les animateurs ne pourront plus ajouter ce rôle s'ils n'ont pas la permission de gérer les rôles !`)
+    if (index_role === -1) return message.reply('Ce rôle n\'est pas dans les rôles d\'animation !')
+    const msg = await message.reply({embeds: [{color: 'RED', description: `Êtes-vous sûr de supprimer le rôle ${role} aux rôles d'animations ? Les animateurs ne pourront plus ajouter ce rôle s'ils n'ont pas la permission de gérer les rôles !`}]})
     msg.react('✅')
     msg.react('❌')
-    const answer = await msg.awaitReactions({filter: filterReaction, time: 10000})
+    const answer = await msg.awaitReactions({filter: filterReaction, idle: 10000, max: 1})
     msg.reactions.removeAll()
     if (!answer.size || answer.first()._emoji.name === '❌') {
-        msg.edit('La commande est annulée').then(m => setTimeout(() => m.delete(), 5000))
+        msg.edit('La commande est annulée.').then(m => setTimeout(() => m.delete(), 5000))
         return
     }
     let Roles = guild.roles
     Roles.splice(index_role, 1)
     client.updateGuild(message.guild, {roles: Roles})
-    msg.edit(`Le rôle ${role} a été supprimé avec succès des rôles d'animation !`)
+    msg.edit({embeds: [{color: 'RED', description: `Le rôle ${role} a été supprimé avec succès des rôles d'animation !`}]})
 }
 module.exports.help = MESSAGES.Commandes.Animation.DELETEROLE;
