@@ -16,7 +16,7 @@ module.exports.run = async (client, message, args, settings) => {
                 const role = await message.guild.roles.fetch(newSetting)
                 if (!role) return message.reply(`"${newSetting}" n'est pas une réponse valable ! Merci d'indiquer un rôle valide en écrivant son ID ou en le taguant comme suit : \`<@&id>\` ou bien \`@nom\` .`)
             }
-            await client.updateGuild(message.guild, {staffrole: newSetting});
+            await client.updateGuild(message.guild, {animationrole: newSetting});
 
             return message.channel.send({embeds: [{color: 'GOLD', title: 'Rôle d\'animation mis à jour :', description: `<@&${settings.animationrole}> est remplacé par <@&${newSetting}>`}]})
         }
