@@ -8,7 +8,15 @@ module.exports = client => {
         const createGuild = await new Guild(merged);
 
         createGuild.save(function (err) { if (err) console.error(); })
-        console.log(`Nouveau serveur : ${guild.guildName} (${guild.guildID})`);
+    }
+
+    client.getAllGuilds = async () => {
+        const guilds_array = []
+        for (const guild in client.guilds) {
+            guilds_array.push(guild.id)
+        }
+        const data = await Guild.find({guildID: {$any: guilds_array}})
+        if (data) return data
     }
 
     client.getGuild = async guild => {
@@ -17,6 +25,12 @@ module.exports = client => {
         if (data) return data;
 
         return client.config.DEFAULTSETTINGS;
+    }
+
+    client.updateSomeGuilds = async (list, settings) => {
+        for (const element in list) {
+            await element.updateOne({$set: settings})
+        }
     }
 
     client.updateGuild = async (guild, settings) => {

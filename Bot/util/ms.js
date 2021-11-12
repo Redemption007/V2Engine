@@ -28,12 +28,12 @@ var y = j * 365.25;
 function parse (str) {
     str = String(str);
     if (str.length > 100) {
-        return;
+        return false;
     }
     var match = (/^(-?(?:\d+)?\.?\d*) *((m((illi)?sec(onde?)?)?s?)|(s(ec(onde?)?s?)?)|(m(in(ute)?s?)?)|(h((eure)|((ou)?r))?s?)|d(ay)?s?|j(our(née)?s?)?|semaines?|w(eeks?)?|a((n(née)?)s?)?|y((ea)?rs?)?)?$/i).exec(str);
 
     if (!match) {
-        return;
+        return false;
     }
     var n = parseFloat(match[1]);
     var type = (match[2] || 'ms').toLowerCase();
@@ -193,5 +193,5 @@ module.exports = function (val, options) {
     } else if (type === 'number' && isFinite(val)) {
         return options ? fmtLong(val) : fmtShort(val);
     }
-    throw new Error('La conversion du module ms() a échouée.');
+    return false
 };

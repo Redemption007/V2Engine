@@ -7,8 +7,8 @@ module.exports = client => {
         const merged = Object.assign({_id: new mongoose.Types.ObjectId()}, user);
         const createUser = await new User(merged);
 
-        console.log(`Nouvel utilisateur : ${user.username} (${user.userID})`);
-        return createUser.save(function (err) { if (err) console.error(); })
+        await createUser.save(function (err) { if (err) console.error(); })
+        return client.getUser(user)
     }
 
 
@@ -45,4 +45,13 @@ module.exports = client => {
         await client.updateUser(member, {xp: xp})
         return client.updateLeaderboard(member, xp[index])
     }
+    /*
+    client.getRole = async (guild, level) {
+        const settings = client.getGuild(guild)
+        if (!settings.recompenses.length) return 1
+        const role = await settings.recompenses.find(A => A[0] === level)
+        if (!role) return 1
+        return role[1]
+    }
+    */
 }

@@ -3,55 +3,23 @@ const discord = require('discord.js')
 module.exports = async (client, message) => {
 
     if (message.author.bot) return;
-    if (message.content.startsWith(';') && message.guild.id === '776429325838319616' && `<@${client.user.id}>`===client.config.NAME) return
+    if (message.guild.id === '776429325838319616' && client.user.id==='705476031162613790') return
     //Cette ligne évite au bot de répondre sur le serveur de test, quand on attend seulement une réponse du bot test, lancé avec le même code.
 
     if (message.channel.type === 'DM') return client.emit('DM', message);
     const settings = await client.getGuild(message.guild)
-    let dbUser = await client.getUser(message.member)
+    if (message.content === settings.prefix) return
     const Chan = message.channel
     const _guild = message.guild
     const deleteWithoutError = () => {
         if (Chan.deleted && Chan.id === settings.generalChannel) return client.getGeneralChannel(_guild)
         if (message.deleted) return
         message.delete().catch(err => console.log('-----------------------------------------------------\n\
-ERREUR lors de la suppression du message de la commande :\n\n' + err+'\n\
------------------------------------------------------'))
+        ERREUR lors de la suppression du message de la commande :\n\n' + err+'\n\
+        -----------------------------------------------------'))
     }
-
-    if (!dbUser) {
-        await client.createUser({
-            guildIDs: [message.member.guild.id],
-            userID: message.author.id,
-            username: message.member.user.tag,
-            dmable: true,
-            xp: [0],
-            level: [0],
-            rang: [message.guild.memberCount]
-        })
-        await settings.updateOne({$push: {leaderboard: [[message.member.id, 0]]}})
-    } else {
-        if (message.content.length>3 && !message.content.startsWith(settings.prefix)) {
-            let index = await dbUser.guildIDs.indexOf(message.guild.id)
-            if (index == -1) {
-                index = await dbUser.guildIDs.length
-                await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
-            }
-            const xpCooldown = Math.floor(Math.random()*4 +1)
-            const xpToAdd = Math.floor(Math.random()*25 +10)
-
-            if (xpCooldown <= 4.3 && xpCooldown >= 3.7) await client.updateXP(message.member, message.guild.id, xpToAdd)
-
-            const userLevel = Math.floor(0.63*Math.log(dbUser.xp[index]))
-            if (dbUser.level[index] !== userLevel) {
-                if (dbUser.level[index] < userLevel && settings.nextLevelMessage.length) message.reply(await client.replaced(message, settings.nextLevelMessage)).catch(async () => message.channel.send(await client.replaced(message, settings.nextLevelMessage)))
-                if (dbUser.level[index] > Math.max(userLevel, 0)) message.reply(`Oh non ! Ton expérience a été descendue et tu es donc revenu au niveau ${userLevel} !`).catch(() => message.channel.send(`Oh non ! Ton expérience a été descendue et tu es donc revenu au niveau ${userLevel} !`))
-                let userLevels = dbUser.level
-                userLevels[index]=userLevel
-                client.updateUser(message.member, {level: userLevels})
-            }
-        }
-    }
+    
+    const dbUser = await client.emit('gainxp', message)
 
     if (!message.content.startsWith(settings.prefix)&&!message.content.startsWith(client.config.NAME)) return;
     if (message.content===';-;') return
@@ -150,7 +118,6 @@ ERREUR lors de la suppression du message de la commande :\n\n' + err+'\n\
     tStamps.set(message.author.id, timeNow);
     setTimeout(() => tStamps.delete(message.author.id), cdAmount);
 
-    dbUser = await client.getUser(message.member)
     await command.run(client, message, args, settings, dbUser);
     setTimeout(() => {
         return deleteWithoutError()
