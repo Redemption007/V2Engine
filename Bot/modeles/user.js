@@ -17,7 +17,8 @@ const userSchema = mongoose.Schema({
     level: {                               //Niveau de l'utilisateur
         "type": Array,
         "default": [0]
-    }
+    },
+    tagBS: Array,                          //Tags BS si l'utilisateur a enregistré un ou plusieurs comptes
 })
 
 module.exports = mongoose.model('User', userSchema);

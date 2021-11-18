@@ -47,7 +47,10 @@ const guildSchema = mongoose.Schema({
     },
     Banned: Array,                                                //Utilisateurs bannis des tournois
     leaderboard: Array,                                           //Classement des xp du serveur : [[user1, xp1], [user2, xp2], etc]
-    roles: Array                                                  //Rôles données pour des animations
+    roles: Array,                                                 //Rôles données pour des animations
+    groups: Array,                                                //Tableau des groupes dans lesquels les absences peuvent être annoncées
+    absences: Array,                                              //Tableau des absences, peut-être absence du staff ou absence d'une équipe
+    clubBS: Array,                                                //Tag du/des club(s) BS du serveur
 })
 
 module.exports = mongoose.model('Guild', guildSchema);

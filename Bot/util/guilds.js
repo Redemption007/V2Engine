@@ -92,4 +92,23 @@ module.exports = client => {
         if (index+1<lb.length && lb[index+1][1]>=lb[index][1]) lb = exchange(index+1)
         return guild.updateOne({leaderboard: lb})
     }
+
+    client.updateAbsences = async (guild, userID, group, duration) => {
+        const server = await client.getGuild(guild)
+        const absences_array = server.absences
+        let user = await absences_array.find(element => element.group === group.toLowerCase() && element.userID === userID)
+        if (!user && !duration) return
+        if (!user && duration) user = {group: group, userID: userID, duree: duration}
+        let index = absences_array.indexOf(user)
+        if (duration) {
+            user.duree = duration
+            user.group = group
+        } else {
+            absences_array.splice(index, 1)
+            return client.updateGuild(guild, {absences: absences_array})
+        }
+        if (index === -1) absences_array.push(user)
+        absences_array[index] = user
+        return client.updateGuild(guild, {absences: absences_array})
+    }
 }
