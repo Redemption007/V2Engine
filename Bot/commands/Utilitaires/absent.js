@@ -15,6 +15,6 @@ module.exports.run = async (client, message, args) => {
         await client.updateAbsences(msg.guild, ID, grp)
         return msg.reply('Ton retour a été enregistré avec succès ! Bon retour parmis nous ^^')
     }, duree, message.author.id, groupe, message)
-    return message.reply('Votre absence a été annoncée avec succès !')
+    return message.reply('Ton absence a été annoncée avec succès ! Tu seras noté de retour automatiquement dans '+ms(duree, true))
 }
 module.exports.help = MESSAGES.Commandes.Utilitaires.ABSENT;

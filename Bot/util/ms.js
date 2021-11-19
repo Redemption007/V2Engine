@@ -178,7 +178,7 @@ function fmtLong (ms) {
   *  - `options` indique le formatage en français [false]
   *
   * @param {String|Number} val
-  * @param {Object} [options]
+  * @param {Boolean} [options]
   * @throws {Error} Rejette une erreur si val n'est pas une chaîne non vide ou un nombre
   * @return {String|Number}
   * @api public
