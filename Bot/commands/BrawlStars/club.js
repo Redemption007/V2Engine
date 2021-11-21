@@ -1,14 +1,12 @@
 const {MESSAGES} = require('../../starterpack/constants')
+const fetch = require('node-fetch')
 
 module.exports.run = async (client, message, args) => {
-    const guild = await client.getGuild(message.guild)
-    const club = args[0]
-    if (!club) return message.reply('Merci de donner un nom de club !')
-    if (!club.match(/^#\w+$/)) return message.reply('Le nom du club n\'est pas valide !')
-    if (guild.groups.includes(club)) return message.reply('Merci d\'indiquer un nom club différent de ceux déjà donnés ! Regarde tous les clubs enregistrés avec la commande `groups`')
-    let groups = guild.groups
-    groups.push(club)
-    await client.updateGuild(message.guild, {groups: groups})
-    return message.reply("Le groupe a été enregistré avec succès.")
+    const user = await client.getUser(message.author)
+    const club = args[0].replace(/^ ?#/, '') || user.profilBS.clubTag
+    if (club && !club.match(/^\w+$/)) return message.reply('Le nom du club n\'est pas valide !')
+    const clubBS = await fetch(`https://api.brawlstars.com/v1/clubs/%23${club}`)
+    if (!clubBS ) return message.reply('Le nom du club n\'est pas valide !')
+    return message.reply({embeds: [{title: `Club ${clubBS.name} (${clubBS.tag}) :`, description: `__Description :__\n> ${clubBS.description}\n__Trophées :__\n> ${clubBS.trophies}\n__Trophées resquis :__\n> ${clubBS.requiredTrophies}\n__Type :__\n> ${clubBS.type}`, color: 'GOLD', footer: {icon_url: message.author.displayAvatarURL(), text: `Club consulté par ${message.member.nickname||message.author.tag}`}}]})
 }
-module.exports.help = MESSAGES.Commandes.Utilitaires.ADDGROUP;
+module.exports.help = MESSAGES.Commandes.BrawlStars.CLUB;

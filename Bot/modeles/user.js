@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema({
         "type": Array,
         "default": [0]
     },
-    tagBS: Array,                          //Tags BS si l'utilisateur a enregistré un ou plusieurs comptes
+    comptes: Array,                          //Tags BS si l'utilisateur a enregistré un ou plusieurs comptes
 })
 
 module.exports = mongoose.model('User', userSchema);

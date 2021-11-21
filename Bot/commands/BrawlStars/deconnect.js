@@ -1,14 +1,32 @@
 const {MESSAGES} = require('../../starterpack/constants')
+const fetch = require('node-fetch')
 
 module.exports.run = async (client, message, args) => {
+    const user = await client.getUser(message.author)
     const guild = await client.getGuild(message.guild)
-    const club = args[0]
-    if (!club) return message.reply('Merci de donner un nom de club !')
-    if (!club.match(/^#\w+$/)) return message.reply('Le nom du club n\'est pas valide !')
-    if (guild.groups.includes(club)) return message.reply('Merci d\'indiquer un nom club différent de ceux déjà donnés ! Regarde tous les clubs enregistrés avec la commande `groups`')
-    let groups = guild.groups
-    groups.push(club)
-    await client.updateGuild(message.guild, {groups: groups})
-    return message.reply("Le groupe a été enregistré avec succès.")
+    const compte = args[0].replace(/^ ?#/, '')
+    if (!compte) return message.reply('Merci de donner un tag de compte Brawl Stars !')
+    if (!compte.match(/^\w+$/)) return message.reply('Le tag du compte Brawl Stars n\'est pas valide !')
+    if (user.comptes.length && !user.comptes.includes(compte)) return message.reply('Merci d\'indiquer un tag des comptes Brawl Stars déjà liés ! Regarde tous tes comptes liés avec la commande `comptes`')
+    const compteBS = await fetch(`https://api.brawlstars.com/v1/players/%23${compte}`)
+    if (!compteBS) return message.reply('Le tag du compte n\'est pas valide !')
+    let groups = user.comptes
+    const index = groups.indexOf(compte)
+    groups.splice(index, 1)
+    await client.updateUser(message.author, {comptes: groups})
+    let desc = ''
+    if (guild.clubBS.length && guild.clubBS.includes(compteBS.club.tag.replace(/ ?#/, ''))) {
+        let still = 0
+        for (let i=0; i<groups.length; i++) {
+            const autre_compte = await fetch(`https://api.brawlstars.com/v1/players/%23${groups[i]}`)
+            if (guild.clubBS.includes(autre_compte.club.tag.replace(/^ ?#/, ''))) still++
+        }
+        const role = await message.guild.roles.cache.find(r => r.name === compteBS.club.name)
+        if (role && !still) {
+            await message.member.roles.remove(role.id)
+            desc = `Le rôle **${role.name}** vous a bien été enlevé.`
+        }
+    }
+    return message.reply(`Le compte Brawl Stars **${compteBS.name}** a été supprimé avec succès.`+desc)
 }
-module.exports.help = MESSAGES.Commandes.Utilitaires.ADDGROUP;
+module.exports.help = MESSAGES.Commandes.BrawlStars.DECONNECT;
