@@ -22,6 +22,12 @@ module.exports = client => {
         if (data) return data;
     }
 
+    client.getAllReactors = async () => {
+        const data = await Reactor.find({})
+
+        if (data) return data
+    }
+
     client.getSenders = async channel => {
         const data = await Reactor.find(re => re.channelsending.includes(channel.id));
 

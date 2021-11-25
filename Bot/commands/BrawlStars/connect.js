@@ -1,14 +1,14 @@
 const {MESSAGES} = require('../../starterpack/constants')
-const fetch = require('node-fetch')
+const {get} = require('axios')
 
 module.exports.run = async (client, message, args) => {
     const user = await client.getUser(message.author)
     const guild = await client.getGuild(message.guild)
-    const compte = args[0].replace(/^ ?#/, '')
+    const compte = args[0].replace(/^ *#?/, '')
     if (!compte) return message.reply('Merci de donner un tag de compte Brawl Stars !')
     if (!compte.match(/^\w+$/)) return message.reply('Le tag du compte Brawl Stars n\'est pas valide !')
     if (user.comptes.length && user.comptes.includes(compte)) return message.reply('Merci d\'indiquer un tag de compte Brawl Stars différent de ceux déjà donnés ! Regarde tous tes comptes liés avec la commande `comptes`')
-    const compteBS = await fetch(`https://api.brawlstars.com/v1/players/%23${compte}`)
+    const compteBS = await get(`https://api.brawlstars.com/v1/players/%23${compte}`)
     if (!compteBS) return message.reply('Le tag du compte n\'est pas valide !')
     let groups = user.comptes
     groups.push(compte)

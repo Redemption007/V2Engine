@@ -16,6 +16,12 @@ module.exports = client => {
         if (voiceChannel) return voiceChannel
     }
 
+    client.getAllVoices = async () => {
+        const data = await Voice.find({})
+
+        if (data) return data
+    }
+
     client.updateVoice = async (voice, settings) => {
         let data = await client.getVoice(voice);
 

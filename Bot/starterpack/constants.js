@@ -55,19 +55,6 @@ const MESSAGES = {
             }
         },
         Animation: {
-            GIVEROLE: {
-                name: "giverole",
-                category: 'Animation',
-                aliases: ["giverole", "gr"],
-                description: "Pour les animateurs. Donne le rôle déterminé. Pour ajouter un rôle déterminé à ajouter, faites `addrole`",
-                cooldown: 5,
-                arg: true,
-                usage: "giverole <@user ou user_ID> <numéro>",
-                isUserModo: false,
-                Admin: false,
-                Modo: false,
-                Animation: true
-            },
             ADDROLE: {
                 name: "addrole",
                 category: 'Animation',
@@ -93,6 +80,19 @@ const MESSAGES = {
                 Admin: true,
                 Modo: false,
                 Animation: false
+            },
+            GIVEROLE: {
+                name: "giverole",
+                category: 'Animation',
+                aliases: ["giverole", "gr"],
+                description: "Pour les animateurs. Donne le rôle déterminé. Pour ajouter un rôle déterminé à ajouter, faites `addrole`",
+                cooldown: 5,
+                arg: true,
+                usage: "giverole <@user ou user_ID> <numéro>",
+                isUserModo: false,
+                Admin: false,
+                Modo: false,
+                Animation: true
             },
             REMOVEROLE: {
                 name: "removerole",
@@ -721,10 +721,10 @@ const MESSAGES = {
                 name: "revenu",
                 category: 'Utilitaires',
                 aliases: ['revenu', 'deretour'],
-                description: "Indique le retour d'un membre plus tôt que prévu",
+                description: "Indique le retour dans un groupe d'un membre plus tôt que prévu",
                 cooldown: 2,
-                arg: false,
-                usage: "revenu",
+                arg: true,
+                usage: "revenu <groupe>",
                 isUserModo: false,
                 Animation: false,
                 Admin: false,

@@ -14,9 +14,9 @@ module.exports = async (client, message) => {
     const deleteWithoutError = () => {
         if (Chan.deleted && Chan.id === settings.generalChannel) return client.getGeneralChannel(_guild)
         if (message.deleted) return
-        message.delete().catch(err => console.log('-----------------------------------------------------\n\
-        ERREUR lors de la suppression du message de la commande :\n\n' + err+'\n\
-        -----------------------------------------------------'))
+        message.delete().catch(err => console.log('\t\t-----------------------------------------------------\n\
+\t\t\tERREUR lors de la suppression du message de la commande :\n\n' + err + '\n\
+\t\t-----------------------------------------------------'))
     }
     
     const dbUser = await client.emit('gainxp', message)

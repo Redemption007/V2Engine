@@ -10,15 +10,6 @@ module.exports = client => {
         createGuild.save(function (err) { if (err) console.error(); })
     }
 
-    client.getAllGuilds = async () => {
-        const guilds_array = []
-        for (const guild in client.guilds) {
-            guilds_array.push(guild.id)
-        }
-        const data = await Guild.find({guildID: {$any: guilds_array}})
-        if (data) return data
-    }
-
     client.getGuild = async guild => {
         const data = await Guild.findOne({guildID: guild.id});
 
@@ -27,10 +18,10 @@ module.exports = client => {
         return client.config.DEFAULTSETTINGS;
     }
 
-    client.updateSomeGuilds = async (list, settings) => {
-        for (const element in list) {
-            await element.updateOne({$set: settings})
-        }
+    client.getAllGuilds = async () => {
+        const data = await Guild.find({})
+
+        if (data) return data
     }
 
     client.updateGuild = async (guild, settings) => {
@@ -96,19 +87,17 @@ module.exports = client => {
     client.updateAbsences = async (guild, userID, group, duration) => {
         const server = await client.getGuild(guild)
         const absences_array = server.absences
-        let user = await absences_array.find(element => element.group === group.toLowerCase() && element.userID === userID)
-        if (!user && !duration) return
-        if (!user && duration) user = {group: group, userID: userID, duree: duration}
-        let index = absences_array.indexOf(user)
-        if (duration) {
-            user.duree = duration
-            user.group = group
-        } else {
+        let user_absence = await absences_array.find(element => element.group.toLowerCase() === group.toLowerCase() && element.userID === userID)
+        let index = absences_array.indexOf(user_absence)
+        if (!duration) {
+            if (!user_absence) return
             absences_array.splice(index, 1)
             return client.updateGuild(guild, {absences: absences_array})
         }
-        if (index === -1) absences_array.push(user)
-        absences_array[index] = user
+        if (!user_absence) user_absence = {group: group, userID: userID}
+        user_absence.duree = duration
+        if (index === -1) absences_array.push(user_absence)
+        absences_array[index] = user_absence
         return client.updateGuild(guild, {absences: absences_array})
     }
 }
