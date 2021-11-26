@@ -9,7 +9,7 @@ module.exports.run = async (client, message, args) => {
     if (!club.match(/^\w+$/)) return message.reply('Le tag du club n\'est pas valide !')
     const already = await guild.clubBS.find(cl => cl.tag === club)
     if (already) return message.reply('Merci d\'indiquer un tag club différent de ceux déjà donnés ! Regarde tous les clubs enregistrés avec la commande `clubs`')
-    const clubBS = await get(`https://api.brawlstars.com/v1/clubs/%23${club}`)
+    const clubBS = await get(`https://api.brawlstars.com/v1/clubs/%23${club}`, {headers: {"X-Requested-With": "XMLHttpRequest", "authorization": `Bearer ${client.config.BS_TOKEN}`}})
     if (!club.name) return message.reply('Le tag du club n\'est pas valide !')
     let clubs = guild.clubBS
     clubs.push({tag: club, name: clubBS.name})

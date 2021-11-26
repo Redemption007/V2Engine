@@ -1,4 +1,4 @@
-const discord = require('discord.js')
+const discord = require('discord.js');
 
 module.exports = async (client, message) => {
 
@@ -9,14 +9,15 @@ module.exports = async (client, message) => {
     if (message.channel.type === 'DM') return client.emit('DM', message);
     const settings = await client.getGuild(message.guild)
     if (message.content === settings.prefix) return
+    const deleteerror = err => {
+        return '\t\t-----------------------------------------------------\n\t\t\tERREUR lors de la suppression du message de la commande :\n\n' + err + '\n\t\t-----------------------------------------------------'
+    }
     const Chan = message.channel
     const _guild = message.guild
     const deleteWithoutError = () => {
         if (Chan.deleted && Chan.id === settings.generalChannel) return client.getGeneralChannel(_guild)
         if (message.deleted) return
-        message.delete().catch(err => console.log('\t\t-----------------------------------------------------\n\
-\t\t\tERREUR lors de la suppression du message de la commande :\n\n' + err + '\n\
-\t\t-----------------------------------------------------'))
+        message.delete().catch(err => console.log(deleteerror(err)))
     }
     
     const dbUser = await client.emit('gainxp', message)
@@ -77,7 +78,7 @@ module.exports = async (client, message) => {
             .setDescription(`<@${message.author.id}>, l'utilisateur ${args[0]} n'existe pas !`);
         setTimeout(() => {
             if (message.deleted) return
-            message.delete().catch(err => console.log('-----------------------------------------------------\nERREUR lors de la suppression du message de la commande :\n\n' + err+'\n-----------------------------------------------------'))
+            message.delete().catch(err => console.log(deleteerror(err)))
         }, 5000)
         return message.channel.send({embeds: [nope]});
     }
@@ -118,7 +119,20 @@ module.exports = async (client, message) => {
     tStamps.set(message.author.id, timeNow);
     setTimeout(() => tStamps.delete(message.author.id), cdAmount);
 
-    await command.run(client, message, args, settings, dbUser);
+    await command.run(client, message, args, settings, dbUser).catch(async err => {
+        const id = await client.createError({
+            guildID: message.guild.id,
+            guildName: message.guild.name,
+            command: command.help.name,
+            user: `${message.author.tag} (${message.author.id})`,
+            date: new Date(Date.now()),
+            content: message.content.slice(long).split(' ').filter(i => i!=='').join(" "),
+            error: err.message,
+            log: err.toString(),
+            source: err.stack
+        })
+        return message.channel.send(`${message.author}, le bot a rencontré une erreur ! Merci de bien vouloir contacter l'owner du bot et de lui donner le code suivant : \`${id}\``)
+    })
     setTimeout(() => {
         return deleteWithoutError()
     }, 2000)

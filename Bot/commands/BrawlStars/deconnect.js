@@ -8,7 +8,7 @@ module.exports.run = async (client, message, args) => {
     if (!compte) return message.reply('Merci de donner un tag de compte Brawl Stars !')
     if (!compte.match(/^\w+$/)) return message.reply('Le tag du compte Brawl Stars n\'est pas valide !')
     if (user.comptes.length && !user.comptes.includes(compte)) return message.reply('Merci d\'indiquer un tag des comptes Brawl Stars déjà liés ! Regarde tous tes comptes liés avec la commande `comptes`')
-    const compteBS = await get(`https://api.brawlstars.com/v1/players/%23${compte}`)
+    const compteBS = await get(`https://api.brawlstars.com/v1/players/%23${compte}`, {headers: {"authorization": `Bearer ${client.config.BS_TOKEN}`}})
     if (!compteBS) return message.reply('Le tag du compte n\'est pas valide !')
     let groups = user.comptes
     const index = groups.indexOf(compte)
