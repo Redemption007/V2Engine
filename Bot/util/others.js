@@ -57,7 +57,11 @@ module.exports = client => {
         }
     }
 
-    client.reTry = f => f().catch(() => setTimeout(() => client.reTry(f), 3000))         //Pour régler la ParallelSave Error de MongoDB. En espérant que ça marche !
+    client.reTry = f => f().catch(err => {                    //Pour régler la ParallelSave Error de MongoDB. En espérant que ça marche !
+        if(err.message === 'ParallelSaveError') {
+            setTimeout(() => client.reTry(f), 3000)
+        }
+    })
 
     //Durée maximale : 1 an, 32 jours 7 heures, 55 minutes et 12 secondes
     client.clock = (f, Time, _1, _2, _3, _4) => {

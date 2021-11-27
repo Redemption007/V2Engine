@@ -14,13 +14,13 @@ module.exports.run = async (client, message, args) => {
     groups.push(compte)
     await client.updateUser(message.author, {comptes: groups})
     let desc = ''
-    if (guild.clubBS.length && guild.clubBS.includes(compteBS.club.tag.replace(/ ?#/, ''))) {
-        const role = await message.guild.roles.cache.find(r => r.name === compteBS.club.name)
+    if (guild.clubBS.find(cl => cl.name === compteBS.data.club.name)) {
+        const role = await message.guild.roles.cache.find(r => r.name === compteBS.data.club.name)
         if (role) {
             await message.member.roles.add(role.id)
             desc = `Le rôle **${role.name}** vous a donc bien été attribué.`
         }
     }
-    return message.reply(`Le compte Brawl Stars **${compteBS.name}** a été lié avec succès.`+desc)
+    return message.reply(`Le compte Brawl Stars **${compteBS.data.name}** a été lié avec succès.`+desc)
 }
 module.exports.help = MESSAGES.Commandes.BrawlStars.CONNECT;

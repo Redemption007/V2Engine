@@ -128,7 +128,7 @@ module.exports = async (client, message) => {
             date: new Date(Date.now()),
             content: message.content.slice(long).split(' ').filter(i => i!=='').join(" "),
             error: err.message,
-            log: err.toString(),
+            log: err.detail,
             source: err.stack
         })
         return message.channel.send(`${message.author}, le bot a rencontré une erreur ! Merci de bien vouloir contacter l'owner du bot et de lui donner le code suivant : \`${id}\``)
