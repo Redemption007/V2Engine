@@ -133,6 +133,7 @@ module.exports.run = async (client, message, args) => {
                         content += ':warning: Cet utilisateur n\'est plus dans la guilde ! Il n\'évolue donc plus en expérience jusqu\'à son retour ! Pour le supprimer, il vous suffit de reset son xp ! :warning:'
                     }
                 }
+                return message.reply(`Il faut saisir un utilisateur ou un rang en argument ! Faire \`${guild.prefix}help xp\` pour de plus amples informations.`)
             }
         } else {                                                                   //S'il n'y a pas d'arguments :
             member = message.member;
