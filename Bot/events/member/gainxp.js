@@ -25,7 +25,11 @@ module.exports = async (client, message) => {
 
     if (xpCooldown <= 4.3 && xpCooldown >= 3.7) await client.updateXP(message.member, message.guild.id, xpToAdd)
 
-    const userLevel = Math.floor(0.7*Math.sqrt(dbUser.xp[index]))
+    let userLevel = 0
+    while (+client.levels[userLevel]<+dbUser.xp[index]) {
+        userLevel++
+    }
+    userLevel--
     if (dbUser.level[index] !== userLevel) {
         if (dbUser.level[index] < userLevel && settings.nextLevelMessage.length) message.reply(await client.replaced(message, settings.nextLevelMessage)).catch(async () => message.channel.send(await client.replaced(message, settings.nextLevelMessage)))
         if (dbUser.level[index] > Math.max(userLevel, 0)) message.reply(`Oh non ! Ton expérience a été descendue et tu es donc revenu au niveau ${userLevel} !`).catch(() => message.channel.send(`Oh non ! Ton expérience a été descendue et tu es donc revenu au niveau ${userLevel} !`))

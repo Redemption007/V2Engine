@@ -15,19 +15,9 @@ module.exports.run = async (client, message, args) => {
     const index = groups.indexOf(compte)
     groups.splice(index, 1)
     await client.updateUser(message.author, {comptes: groups})
-    let desc = ''
     if (guild.clubBS.find(cl => cl.name === compteBS.data.club.name)) {
-        let still = 0
-        for (let i=0; i<groups.length; i++) {
-            const autre_compte = await get(`https://api.brawlstars.com/v1/players/%23${groups[i]}`, {headers: {"authorization": `Bearer ${client.config.BS_TOKEN}`}})
-            if (guild.clubBS.find(cl => cl.name === autre_compte.data.club.name)) still++
-        }
-        const role = await message.guild.roles.cache.find(r => r.name === compteBS.data.club.name)
-        if (role && !still) {
-            await message.member.roles.remove(role.id).catch()
-            desc = `Le rôle **${role.name}** vous a bien été enlevé.`
-        }
+        await client.emit('updateClubMember', guild, compteBS, groups, message, message.author)
     }
-    return message.reply(`Le compte Brawl Stars **${compteBS.data.name}** a été supprimé avec succès.`+desc)
+    return message.reply(`Le compte Brawl Stars **${compteBS.data.name}** a été supprimé avec succès.`)
 }
 module.exports.help = MESSAGES.Commandes.BrawlStars.DECONNECT;

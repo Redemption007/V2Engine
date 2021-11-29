@@ -3,15 +3,24 @@ const {get} = require('axios')
 
 module.exports.run = async (client, message, args) => {
     let utilisateur = {}
-    if (message.mentions.members.size) utilisateur = message.mentions.users.first()
+    let compte = ''
+    if (message.mentions.members.size) {
+        utilisateur = message.mentions.members.first()
+        compte = args[1].replace(/^ *#?/, '')
+    }
+    else if (!args[0].match(/^ *#/)){
+        const userExists = await message.guild.members.fetch(args[0]).catch()
+        if (!isNaN(args[0]) && userExists) {
+            utilisateur = userExists
+            compte = args[1].replace(/^ *#?/, '')
+        }
+    }
     else {
-        const userExists = message.guild.members.fetch(args[0]).catch()
-        if (!args[0].isNaN() && userExists) utilisateur = {id: args[0]}
-        else utilisateur = message.author
+        utilisateur = message.author
+        compte = args[0].replace(/^ *#?/, '')
     }
     const user = await client.getUser(utilisateur)
     const guild = await client.getGuild(message.guild)
-    const compte = args[1].replace(/^ *#?/, '')
     if (!user) return message.reply("L'utilisateur saisi n'est pas valide ou n'a pas de profil utilisateur !")
     if (!compte) return message.reply('Merci de donner un tag de compte Brawl Stars !')
     if (!compte.match(/^\w+$/)) return message.reply('Le tag du compte Brawl Stars n\'est pas valide !')
@@ -21,20 +30,16 @@ module.exports.run = async (client, message, args) => {
     let groups = user.comptes
     const index = groups.indexOf(compte)
     groups.splice(index, 1)
-    await client.updateUser(message.author, {comptes: groups})
-    let desc = ''
+    await client.updateUser(utilisateur, {comptes: groups})
+    /*
+    IDEE :
+    Faire un événement personnalisé que j'appelle dans les commandes deconnect, force deconnect et stats
+    Ainsi, si le mec se barre du club avec son compte, la prochaine fois que qqun regarde son compte, le rôle lui sera enlevé
+    Je peux aussi l'appeler en boucle dans la commande club, pour vérifier tous les membres du clan d'un coup. Il faudra simplement penser
+    */
     if (guild.clubBS.find(cl => cl.name === compteBS.data.club.name)) {
-        let still = 0
-        for (let i=0; i<groups.length; i++) {
-            const autre_compte = await get(`https://api.brawlstars.com/v1/players/%23${groups[i]}`, {headers: {"authorization": `Bearer ${client.config.BS_TOKEN}`}})
-            if (guild.clubBS.find(cl => cl.name === autre_compte.data.club.name)) still++
-        }
-        const role = await message.guild.roles.cache.find(r => r.name === compteBS.data.club.name)
-        if (role && !still) {
-            await message.member.roles.remove(role.id).catch()
-            desc = `Le rôle **${role.name}** lui a bien été enlevé.`
-        }
+        client.emit('updateClubMember', guild, compteBS, groups, message, utilisateur)
     }
-    return message.reply(`Le compte Brawl Stars **${compteBS.data.name}** a été supprimé avec succès des comptes liés de <@${utilisateur.id}>.`+desc)
+    return message.reply(`Le compte Brawl Stars **${compteBS.data.name}** a été supprimé avec succès des comptes liés de <@${utilisateur.id}>.`)
 }
 module.exports.help = MESSAGES.Commandes.BrawlStars.FORCEDECONNECT;

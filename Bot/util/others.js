@@ -153,12 +153,17 @@ module.exports = client => {
         const guild = await client.getGuild(message.guild)
         const dbUser = await client.getUser(message.member)
         const index = await dbUser.guildIDs.indexOf(message.guild.id)
-        const level = Math.floor(0.63*Math.log(dbUser.xp[index]))
+        let level = 0
+        while (+client.levels[level]<+dbUser.xp[index]) {
+            level++
+        }
+        level--
         const rang = guild.leaderboard.findIndex(rang => rang[0]===message.member.id)
-        const xp_restante = Math.floor(dbUser.xp[index] - Math.exp(level/0.63))
-        const pallier = Math.floor(Math.exp((level+1)/0.63))-Math.floor(Math.exp(level/0.63))
+        const pallier = client.levels[level+1]-client.levels[level]
 
-        const final_string = string.replace(/{{userlevel}}/gi, level).replace(/{{rang}}/gi, rang).replace(/{{xp_restante}}/gi, client.arrondir(xp_restante)).replace(/{{pallier}}/gi, client.arrondir(pallier)).replace(/{{user}}/gi, message.author).replace(/{{usertag}}/gi, message.author.tag).replace(/{{nickname}}/gi, message.member.nickname?message.member.nickname:message.author.username).replace(/{{servername}}/gi, message.guild.name)
+        const final_string = string.replace(/{{userlevel}}/gi, level).replace(/{{rang}}/gi, rang).replace(/{{pallier}}/gi, client.arrondir(pallier)).replace(/{{user}}/gi, message.author).replace(/{{usertag}}/gi, message.author.tag).replace(/{{nickname}}/gi, message.member.nickname?message.member.nickname:message.author.username).replace(/{{servername}}/gi, message.guild.name)
         return final_string
     }
+
+    client.levels = ['0', '100', '255', '475', '770', '1150', '1625', '2205', '2900', '3720', '4675', '5775', '7030', '8450', '10045', '11825', '13800', '15980', '18375', '20995', '23850', '26950', '30305', '33925', '37820', '42000', '46475', '51255', '56350', '61770', '67525', '73625', '80080', '86900', '94095', '101675', '109650', '118030', '126825', '136045', '145700', '155800', '166355', '177375', '188870', '200850', '213325', '226305', '239800', '253820', '268375', '283475', '299130', '315350', '332145', '349525', '367500', '386080', '405275', '425095', '445550', '466650', '488405', '510825', '533920', '557700', '582175', '607355', '633250', '659870', '687225', '715325', '744180', '773800', '804195', '835375', '867350', '900130', '933725', '968145', '1003,400', '1039,500', '1076,455', '1114275', '1152970', '1192550', '1233025', '1274405', '1316700', '1359920', '1404075', '1449175', '1495230', '1542250', '1590245', '1639225', '1689200', '1740180', '1792175', '1845195', '1899250']
 }

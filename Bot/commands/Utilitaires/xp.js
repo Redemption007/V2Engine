@@ -151,10 +151,14 @@ module.exports.run = async (client, message, args) => {
     if (tag[0].length>=15 && tag[0].length<=20) i = 10
     if (tag[0].length>20) i = 15
     if (tag[0].length>30) i = 17
-    const level = Math.floor(0.63*Math.log(dbUser.xp[index]))
+    let level = 0
+    while (+client.levels[level]<+dbUser.xp[index]) {
+        level++
+    }
+    level--
     const rang = guild.leaderboard.findIndex(rang => rang[0]===member.id)+1
-    const xp_restante = Math.floor(dbUser.xp[index] - Math.exp(level/0.63))
-    const pallier = Math.floor(Math.exp((level+1)/0.63))-Math.floor(Math.exp(level/0.63))
+    const pallier = client.levels[level+1]-client.levels[level]
+    const xp_restante = dbUser.xp[index]-client.levels[level]
     //Images
     let avatar
     try {                                                                                     //Avatar de membre
