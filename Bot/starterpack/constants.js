@@ -253,6 +253,19 @@ const MESSAGES = {
                 Animation: false,
                 Admin: true,
                 Modo: false,
+            },
+            TAG: {
+                name: "tag",
+                category: 'BrawlStars',
+                aliases: ['tag'],
+                description: "Envoie le message explicatif pour trouver son tag Brawl Stars.",
+                cooldown: 15,
+                arg: false,
+                usage: "tag",
+                isUserModo: false,
+                Animation: false,
+                Admin: false,
+                Modo: false,
             }
         },
         Helper: {
