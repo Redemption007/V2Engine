@@ -1,14 +1,6 @@
 pipeline {
   agent any
-    
-  tools {
-    nodejs {
-      env.NODEJS_HOME = "${tool 'Node 17.7.0'}"
-      // on linux / mac
-      env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
-    }
-  }
-    
+  
   stages {
         
     stage('Git') {
@@ -19,6 +11,9 @@ pipeline {
      
     stage('Build') {
       steps {
+        nodejs(nodeJSInstallationName: 'Node 6.x', configId: '<config-file-provider-id>') {
+          sh 'npm config ls'
+        }
         sh 'npm install'
       }
     }  
