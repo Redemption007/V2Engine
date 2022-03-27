@@ -1,7 +1,0 @@
--#!/bin/sh
-ssh root@104.248.39.18 <  cd V2Engine
- git pull
- npm install --production
- pm2 restart all
- exit
-EOF
