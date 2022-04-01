@@ -1,6 +1,0 @@
-node_modules
-.env
-.npmrc
-.eslintrc.json
-*.jpg
-*.png
