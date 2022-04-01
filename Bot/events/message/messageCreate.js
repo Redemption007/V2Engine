@@ -23,7 +23,7 @@ module.exports = async (client, message) => {
 
     if (!message.content.startsWith(settings.prefix)&&!message.content.startsWith(client.config.NAME)) return;
 
-    if (message.content === `${client.config.NAME} prefix`) return message.reply({embeds: [{title: "On m'a appelé ?", color: 'GOLD', description: `Mon préfixe sur ce serveur est : \`${settings.prefix}\``}]})
+    if (message.content === `${client.config.NAME} prefix`||message.content === `${client.config.NAME}`) return message.reply({embeds: [{title: "On m'a appelé ?", color: 'GOLD', description: `Mon préfixe sur ce serveur est : \`${settings.prefix}\``}]})
     
     let long = 0;
     if (message.content.startsWith(settings.prefix)) {

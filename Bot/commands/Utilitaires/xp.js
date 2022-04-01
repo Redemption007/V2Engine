@@ -153,10 +153,9 @@ module.exports.run = async (client, message, args) => {
     if (tag[0].length>20) i = 15
     if (tag[0].length>30) i = 17
     let level = 0
-    while (+client.levels[level]<+dbUser.xp[index]) {
+    while (+client.levels[level+1]<+dbUser.xp[index]) {
         level++
     }
-    level--
     const rang = guild.leaderboard.findIndex(rang => rang[0]===member.id)+1
     const pallier = client.levels[level+1]-client.levels[level]
     const xp_restante = dbUser.xp[index]-client.levels[level]
