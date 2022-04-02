@@ -5,7 +5,7 @@ module.exports.run = async (client, message, args, settings) => {
     let xp = +args[1]
 
     if (!member) { //Si aucun utilisateur n'est mentionné, alors l'utilisateur concerné est celui qui tape la commande
-        member = await message.guild.members.fetch(message.author.id)
+        member = await message.member
         xp = +args[0]
     }
     //On vérifie que pour chaque cas, xp est bien un nombre
@@ -15,17 +15,21 @@ module.exports.run = async (client, message, args, settings) => {
 
     if (!dbUserMentionned) {
         await client.createUser({
-            guildID: member.guild.id,
-            guildName: member.guild.name,
+            guildID: [member.guild.id],
             userID: member.id,
             username: member.user.tag,
-            xp: xp
+            xp: [xp]
         })
 
-        return message.reply({embeds: [{color: 'BLUE', title: 'Ajout d\'xp réussi !', description: `Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${xp}`}]})
+        return message.reply({embeds: [{color: 'BLUE', title: 'Ajout d\'xp réussi !', description: `Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp total actuel : ${xp}`}]})
     }
-    await client.updateXP(member, xp)
+    let index = await dbUserMentionned.guildIDs.indexOf(message.guild.id)
+    if (index == -1) {
+        index = await dbUserMentionned.guildIDs.length
+        await client.updateUser(message.author, {$push: {guildIDs: message.guild.id, xp: 0, level: 0}})
+    }
+    await client.updateXP(member, message.guild.id, Math.abs(xp))
 
-    return message.reply({embeds: [{color: 'BLUE', title: 'Ajout d\'xp réussi !', description: `Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp actuel : ${dbUserMentionned.xp+xp}`}]})
+    return message.reply({embeds: [{color: 'BLUE', title: 'Ajout d\'xp réussi !', description: `Vous avez ajouté ${xp} points d'xp à <@${member.id}>.\nVoici son xp total actuel : ${dbUserMentionned.xp[index]+xp}`}]})
 }
 module.exports.help = MESSAGES.Commandes.Moderation.ADDXP;

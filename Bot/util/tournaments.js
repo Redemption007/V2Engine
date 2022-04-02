@@ -17,6 +17,12 @@ module.exports = client => {
         if (data) return data;
     }
 
+    client.getAllTournois = async () => {
+        const data = await Tournoi.find({})
+
+        if (data) return data
+    }
+
     client.registerTournoi = async (tournoi, one) => {
         if (tournoi.Compo === 1 || tournoi.Random) {
             await tournoi.Inscrits.push({members: [one]})

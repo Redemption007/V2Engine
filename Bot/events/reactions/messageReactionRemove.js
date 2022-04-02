@@ -6,7 +6,9 @@ module.exports = async (client, MessageReaction, user) => {
     const emojiName = MessageReaction.emoji.name
     const messageReactor = await client.getReactor(message)
     const dbUser = client.getUser(user)
-    let DMable = dbUser.dmable
+    let DMable
+    if (dbUser) DMable = dbUser.dmable
+    else DMable = true
 
     if (DMable === undefined) DMable = true
     if (DMable && !user.dmChannel) {

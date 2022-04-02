@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,   //ID propre à MongoDB
-    guildID: String,                       //ID du serveur
+    guildIDs: Array,                       //ID du serveur
     userID: String,                        //ID de l'utilisateur
     username: String,                      //Pseudo de l'utilisateur (pas du membre !)
     dmable: {                              //Si l'utilisateur a accepté les DMs du bot
@@ -11,13 +11,14 @@ const userSchema = mongoose.Schema({
         "default": true
     },
     xp: {                                  //xp de l'utilisateur
-        "type": Number,
-        "default": 0
+        "type": Array,
+        "default": [0]
     },
     level: {                               //Niveau de l'utilisateur
-        "type": Number,
-        "default": 0
-    }
+        "type": Array,
+        "default": [0]
+    },
+    comptes: Array,                          //Tags BS si l'utilisateur a enregistré un ou plusieurs comptes
 })
 
 module.exports = mongoose.model('User', userSchema);

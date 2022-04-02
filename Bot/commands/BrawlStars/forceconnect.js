@@ -1,0 +1,30 @@
+const {MESSAGES} = require('../../starterpack/constants')
+const {get} = require('axios')
+
+module.exports.run = async (client, message, args) => {
+    const mentionned = message.mentions.members.first()
+    if (!mentionned) return message.reply('Merci de mentionner un utilisateur valide !')
+
+    const user = await client.getUser(mentionned)
+    const guild = await client.getGuild(message.guild)
+    const compte = args[1].replace(/^ *#?/, '')
+    if (!compte) return message.reply('Merci de donner un tag de compte Brawl Stars !')
+    if (!compte.match(/^\w+$/)) return message.reply('Le tag du compte Brawl Stars n\'est pas valide !')
+    if (user.comptes.length && user.comptes.includes(compte)) return message.reply('Merci d\'indiquer un tag de compte Brawl Stars différent de ceux déjà donnés ! Regarde tous tes comptes liés avec la commande `comptes`')
+    const compteBS = await get(`https://api.brawlstars.com/v1/players/%23${compte}`, {headers: {"authorization": `Bearer ${client.config.BS_TOKEN}`}})
+    if (!compteBS) return message.reply('Le tag du compte n\'est pas valide !')
+    let groups = user.comptes
+    groups.push(compte)
+    await client.updateUser({id: user.userID}, {comptes: groups})
+    let desc = ''
+    if (guild.clubBS.find(cl => cl.name === compteBS.data.club.name)) {
+        const role = await message.guild.roles.cache.find(r => r.name === compteBS.data.club.name)
+        if (role) {
+            const member = await message.guild.members.fetch(mentionned)
+            member.add(role.id)
+            desc = `Le rôle **${role.name}** a bien été attribué.`
+        }
+    }
+    return message.reply(`Le compte Brawl Stars **${compteBS.data.name}** a été lié avec succès à <@!${user.userID}>.`+desc)
+}
+module.exports.help = MESSAGES.Commandes.BrawlStars.FORCECONNECT;

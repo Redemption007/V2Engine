@@ -1,4 +1,6 @@
 module.exports = client => {
+    require('./errors')(client)
+
     require('./guilds')(client);
 
     require('./others')(client);

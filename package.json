@@ -1,9 +1,4 @@
 {
-  "dependencies": {
-    "discord.js": "^13.1.0",
-    "dotenv": "^10.0.0",
-    "mongoose": "^6.0.5"
-  },
   "name": "v2engine",
   "author": {
     "name": "Baptiste M.",
@@ -12,9 +7,20 @@
   },
   "version": "0.1.0",
   "git repository": "https://github.com/Redemption007/V2Engine",
+  "readme": "./README.md",
+  "description": "Modèle d'application : Bot Discord v13",
+  "engines": {
+    "node": "16.9.0"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "canvas": "^2.8.0",
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
+    "mongoose": "^6.0.14",
+    "pm2": "^5.2.0"
+  },
   "devDependencies": {
     "eslint": "^7.23.0"
-  },
-  "readme": "./README.md",
-  "description": "Modèle d'application : Bot Discord v13"
+  }
 }

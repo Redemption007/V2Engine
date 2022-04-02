@@ -28,12 +28,12 @@ var y = j * 365.25;
 function parse (str) {
     str = String(str);
     if (str.length > 100) {
-        return;
+        return false;
     }
-    var match = (/^(-?(?:\d+)?\.?\d+) *(millisecondes?|msecs?|ms|secondes?|secs?|s|minutes?|mins?|m|heures?|hrs?|h|d|days?|jours?|j|semaines?|weeks?|w|anné?e?es?|ans?|a|years?|yrs?|y)?$/i).exec(str);
+    var match = (/^(-?(?:\d+)?\.?\d*) *((m((illi)?sec(onde?)?)?s?)|(s(ec(onde?)?s?)?)|(m(in(ute)?s?)?)|(h((eure)|((ou)?r))?s?)|d(ay)?s?|j(our(née)?s?)?|semaines?|w(eeks?)?|a((n(née)?)s?)?|y((ea)?rs?)?)?$/i).exec(str);
 
     if (!match) {
-        return;
+        return false;
     }
     var n = parseFloat(match[1]);
     var type = (match[2] || 'ms').toLowerCase();
@@ -134,7 +134,7 @@ function fmtShort (ms) {
 function plural (ms, n, name) {
     var isPlural = ms >= n * 1.5;
 
-    return Math.round(ms / n) + ' ' + name + (isPlural ? 's ' : ' ');
+    return `${Math.round(ms / n)} ${name}${isPlural ? 's ' : ''}`;
 }
 
 /**
@@ -178,7 +178,7 @@ function fmtLong (ms) {
   *  - `options` indique le formatage en français [false]
   *
   * @param {String|Number} val
-  * @param {Object} [options]
+  * @param {Boolean} [options]
   * @throws {Error} Rejette une erreur si val n'est pas une chaîne non vide ou un nombre
   * @return {String|Number}
   * @api public
@@ -193,5 +193,5 @@ module.exports = function (val, options) {
     } else if (type === 'number' && isFinite(val)) {
         return options ? fmtLong(val) : fmtShort(val);
     }
-    throw new Error('La conversion du module ms() a échouée.');
+    return false
 };
